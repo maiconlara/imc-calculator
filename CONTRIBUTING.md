@@ -21,6 +21,14 @@ Then, at the repository root:
 pnpm install
 ```
 
+The API reads its settings from `apps/backend/.env`, which Git ignores. Create it from the sample, whose values work for development:
+
+```bash
+cp apps/backend/.env.example apps/backend/.env
+```
+
+The API refuses to start without `JWT_ACCESS_SECRET`, and refuses the sample secret when `NODE_ENV` is `production`.
+
 ## A change from start to finish
 
 1. **Issue.** Every change has an issue that says what changes, for whom, and how to know it is done. Use the repository issue templates.

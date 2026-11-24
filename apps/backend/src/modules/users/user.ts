@@ -1,4 +1,4 @@
-import type { Role, UserStatus } from "@imc-calculator/shared";
+import type { Role, SessionUser, UserStatus } from "@imc-calculator/shared";
 
 export interface User {
   id: string;
@@ -9,3 +9,5 @@ export interface User {
   status: UserStatus;
   createdAt: Date;
 }
+
+export type AuthenticatedUser = SessionUser;

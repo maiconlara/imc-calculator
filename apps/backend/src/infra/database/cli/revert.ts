@@ -1,9 +1,9 @@
 import { MigrationExecutor } from "typeorm";
-import { loadEnv } from "../../../config/env";
+import { loadMigrationEnv } from "../../../config/env";
 import { createLogger } from "../../logger";
 import { createDataSource } from "../data-source";
 
-const env = loadEnv();
+const env = loadMigrationEnv();
 const logger = createLogger(env);
 const dataSource = await createDataSource({ database: env.DB_DATABASE }).initialize();
 

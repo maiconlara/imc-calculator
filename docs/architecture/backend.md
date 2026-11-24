@@ -27,6 +27,7 @@ src/
 ├── app.ts                  builds the Express app: security headers, logs, routes, error handling
 ├── container.ts            binds every interface to its implementation
 ├── config/env.ts           environment variables validated with Zod
+├── types/express.d.ts      types `req.user`, the user loaded by `authenticateRequest`
 ├── modules/
 │   ├── auth/               login, session renewal, logout, token and hasher interfaces
 │   ├── users/              registration, status and user permissions
@@ -50,19 +51,21 @@ A module folder holds its routes, controller, service, repository interface, map
 - **Refresh token:** a random opaque value, stored in the `usuario_token` table only as a SHA-256 hash. It is rotated on every use, and the previous one stays valid for 30 seconds so parallel requests do not end the session.
 - `authenticateRequest` validates the token and loads the user from the database on every request. An inactive or deleted user is rejected right away.
 - `requireRole(...roles)` blocks a route for the other roles.
+- `POST /auth/login` allows 10 failed attempts per client IP and username in 10 minutes, then answers 429 until the window ends. Successful logins do not count. The panel server calls the API for every visitor and forwards the visitor IP, which is why the limit needs `TRUST_PROXY` and also counts per username.
 - The service repeats the role check and adds the checks that depend on data, such as "a teacher only edits students". The route is the first barrier, not the only one. See [decision 0003](../decisions/0003-backend-layers-and-dependency-injection.md).
 
 ## Errors
 
 Business errors are thrown as classes from `shared/errors.ts` and turned into HTTP responses by a single error handler:
 
-| Class               | Status | When                                                  |
-| ------------------- | ------ | ----------------------------------------------------- |
-| `UnauthorizedError` | 401    | Missing, invalid or expired session                   |
-| `ForbiddenError`    | 403    | The role cannot do this                               |
-| `NotFoundError`     | 404    | The resource does not exist or is not visible         |
-| `ConflictError`     | 409    | Username in use, user with linked assessments         |
-| `BusinessRuleError` | 422    | A rule blocks the action (inactive student, own role) |
+| Class                  | Status | When                                                  |
+| ---------------------- | ------ | ----------------------------------------------------- |
+| `UnauthorizedError`    | 401    | Missing, invalid or expired session                   |
+| `ForbiddenError`       | 403    | The role cannot do this                               |
+| `NotFoundError`        | 404    | The resource does not exist or is not visible         |
+| `ConflictError`        | 409    | Username in use, user with linked assessments         |
+| `BusinessRuleError`    | 422    | A rule blocks the action (inactive student, own role) |
+| `TooManyRequestsError` | 429    | Too many failed login attempts                        |
 
 A `ZodError` becomes a 400 with one entry per invalid field. Anything else is logged and becomes a 500 with a generic message. Every error response has the same shape: `{ "message": string, "issues"?: [{ "path": string, "message": string }] }`.
 
@@ -70,16 +73,20 @@ Express 5 forwards errors thrown by async handlers to the error handler, so cont
 
 ## Configuration
 
-Every setting comes from an environment variable, validated at startup by `config/env.ts`, and the app refuses to start with an invalid value. The full list with sample values is in `apps/backend/.env.example`; a new setting is added to both files and to this table in the same PR.
+Every setting comes from an environment variable, validated at startup by `config/env.ts`, and the app refuses to start with an invalid value. The full list with sample values is in `apps/backend/.env.example`; a new setting is added to both files and to this table in the same PR. The migrate and revert commands validate only `NODE_ENV`, `LOG_LEVEL` and `DB_DATABASE`, so they run without the API secrets.
 
-| Variable      | Purpose                               |
-| ------------- | ------------------------------------- |
-| `NODE_ENV`    | `development`, `test` or `production` |
-| `PORT`        | API port                              |
-| `LOG_LEVEL`   | pino log level                        |
-| `CORS_ORIGIN` | Allowed origins, comma separated      |
-| `TRUST_PROXY` | Who may report the real client IP     |
-| `DB_DATABASE` | SQLite file path                      |
+| Variable                 | Purpose                                                                                                                               |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `NODE_ENV`               | `development`, `test` or `production`                                                                                                 |
+| `PORT`                   | API port                                                                                                                              |
+| `LOG_LEVEL`              | pino log level                                                                                                                        |
+| `CORS_ORIGIN`            | Allowed origins, comma separated                                                                                                      |
+| `TRUST_PROXY`            | Who may report the real client IP                                                                                                     |
+| `DB_DATABASE`            | SQLite file path                                                                                                                      |
+| `JWT_ACCESS_SECRET`      | Secret that signs the access token, at least 32 characters. Required, and the sample value of `.env.example` is refused in production |
+| `JWT_ACCESS_TTL_MINUTES` | Access token lifetime in minutes (15 by default)                                                                                      |
+| `REFRESH_TOKEN_TTL_DAYS` | Refresh token lifetime in days (7 by default)                                                                                         |
+| `BCRYPT_ROUNDS`          | bcrypt cost factor of the password hashes (10 by default)                                                                             |
 
 ## Adding a module
 

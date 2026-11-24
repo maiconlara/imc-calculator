@@ -76,7 +76,7 @@ Reasoning in [decision 0004](../decisions/0004-database-in-portuguese-code-in-en
 - Live in `apps/backend/src/infra/database/migrations` and are registered in `data-source.ts`.
 - One migration per change, named `<timestamp>-<what-it-does>.ts`, with `up` and `down`.
 - A migration that was already applied anywhere is never edited. To fix it, write a new one.
-- `pnpm db:migrate` applies the pending migrations and `pnpm db:revert` reverts the last one. Both read `DB_DATABASE` from `apps/backend/.env`. In production, after the build, `node dist/migrate.mjs` applies them without TypeScript tooling.
+- `pnpm db:migrate` applies the pending migrations and `pnpm db:revert` reverts the last one. Both read only `NODE_ENV`, `LOG_LEVEL` and `DB_DATABASE` (from `apps/backend/.env` when it exists), so they run without the API secrets. In production, after the build, `node dist/migrate.mjs` applies them without TypeScript tooling.
 - The end-to-end tests run every migration on an in-memory database before each test, and `test/database.test.ts` checks the tables, the stored Portuguese values and the revert.
 - The API logs a warning on startup if there are pending migrations.
 

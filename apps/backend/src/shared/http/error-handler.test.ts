@@ -10,6 +10,7 @@ import {
   ConflictError,
   ForbiddenError,
   NotFoundError,
+  TooManyRequestsError,
   UnauthorizedError,
 } from "../errors";
 import { handleErrors } from "./error-handler";
@@ -39,6 +40,11 @@ describe("handleErrors", () => {
       'O usuário "ana" já está em uso.',
     ],
     [new BusinessRuleError("Aluno inativo."), 422, "Aluno inativo."],
+    [
+      new TooManyRequestsError("Muitas tentativas de login."),
+      429,
+      "Muitas tentativas de login.",
+    ],
   ])("turns %s into status %s", async (domainError, expectedStatus, expectedMessage) => {
     const response = await request(createAppThatThrows(domainError)).get("/fails");
 

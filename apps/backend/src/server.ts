@@ -1,7 +1,7 @@
 import type { Server } from "node:http";
 import { createApp } from "./app";
 import type { Env } from "./config/env";
-import { createContainer } from "./container";
+import { createContainer, type ContainerSettings } from "./container";
 import { createDataSource } from "./infra/database/data-source";
 import type { Logger } from "./infra/logger";
 
@@ -26,7 +26,8 @@ function waitUntilListening(httpServer: Server): Promise<void> {
  * @returns The port in use and a function that stops the server and closes the database.
  */
 export async function startServer(
-  env: Pick<Env, "DB_DATABASE" | "PORT" | "CORS_ORIGIN" | "TRUST_PROXY">,
+  env: Pick<Env, "DB_DATABASE" | "PORT" | "CORS_ORIGIN" | "TRUST_PROXY"> &
+    ContainerSettings,
   logger: Logger,
 ): Promise<RunningServer> {
   const dataSource = createDataSource({ database: env.DB_DATABASE });
@@ -39,7 +40,7 @@ export async function startServer(
       );
     }
 
-    const app = createApp(createContainer({ dataSource }), {
+    const app = createApp(createContainer({ dataSource, env }), {
       logger,
       allowedOrigins: env.CORS_ORIGIN,
       trustProxy: env.TRUST_PROXY,
