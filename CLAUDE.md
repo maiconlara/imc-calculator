@@ -14,7 +14,13 @@ They live in `.claude/agents/`. Call one by name when the task fits:
 | `frontend-developer` | Screen, component, hook, service or form in the panel                          |
 | `code-reviewer`      | Before opening a PR: reviews the diff against this guide and the documentation |
 
-A task that touches both sides starts in `packages/shared`, moves to the backend and ends in the frontend.
+How to use them:
+
+- Brief each agent with the issue, its acceptance criteria and the current branch. Each agent file lists the inputs it expects and the folders it owns.
+- A task that touches both sides starts with the `backend-developer` (which owns `packages/shared`) and ends with the `frontend-developer`. Pass the `api_contract` from the backend report to the frontend agent.
+- Every agent returns a structured report. A `blocked` status or a finding for another owner means the session decides the next step, not the agent.
+- Carry `decisions_for_pr_body` and `not_verified` from the reports into the pull request description.
+- Agents never commit, push or open pull requests.
 
 ### Skills
 

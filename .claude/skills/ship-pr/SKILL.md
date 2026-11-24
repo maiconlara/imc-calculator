@@ -57,7 +57,7 @@ Ask before opening it. Use the repository template and a title in the commit con
 gh pr create --base main --title "feat(backend): add user management" --body-file <filled template>
 ```
 
-The body must include `Closes #<issue>`, what changed, how it was tested and anything not verified.
+The body must include `Closes #<issue>`, what changed, how it was tested and anything not verified. When agents did the work, use their reports: `decisions_for_pr_body` goes under "How it was done", the check results and `browser_check` under "How it was tested", and every `not_verified` item is listed as such.
 
 ## 7. Hand over
 

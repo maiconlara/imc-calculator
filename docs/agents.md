@@ -25,7 +25,12 @@ Rules are never duplicated between these files. `AGENTS.md` states a rule in one
     └── ship-pr/SKILL.md        from a finished change to an open pull request
 ```
 
-- **Agents** are specialists with their own instructions and tools. The main session delegates a focused task to one of them and gets back a report.
+- **Agents** are specialists with their own instructions, tools and model (Opus). The main session delegates a focused task to one of them and gets back a report. Each agent file states:
+  - **Ownership:** the folders it may change. Anything else becomes a finding for its owner, so two agents never edit the same files.
+  - **Expected inputs:** what the session must pass (issue, acceptance criteria, branch and, for the frontend, the API contract). Missing input means `status: blocked` with a question, never a guess.
+  - **Workflow:** triage, implementation order and validation, stopping after two failed attempts at the same check.
+  - **Report:** a fixed structure with the status, each acceptance criterion as changed or explained, files, check results, the API contract, findings for other owners, decisions for the PR description and what was not verified.
+  - **Anti-patterns:** concrete mistakes to avoid in this code base.
 - **Skills** are step by step guides for tasks that repeat. New skills are added together with the code they teach how to change, so a skill never describes code that does not exist yet.
 
 ## How a task flows
