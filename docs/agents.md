@@ -22,7 +22,8 @@ Rules are never duplicated between these files. `AGENTS.md` states a rule in one
 │   ├── frontend-developer.md   panel work
 │   └── code-reviewer.md        read-only review of a diff
 ├── skills/
-│   └── ship-pr/SKILL.md        from a finished change to an open pull request
+│   ├── ship-pr/SKILL.md        from a finished change to an open pull request
+│   └── add-bmi-band/SKILL.md   add, split, change, rename or remove a BMI band
 └── settings.json               what runs without asking, what asks first, what is denied
 ```
 

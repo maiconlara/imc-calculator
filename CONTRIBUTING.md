@@ -11,7 +11,9 @@ This guide applies to people and agents. The code rules are in [AGENTS.md](AGENT
   npm install -g pnpm@12.23.0
   ```
 
-  pnpm 12 is a native binary that npm sets up during the install. An older pnpm that switches versions by itself can download pnpm 12 but fail to start it on Windows.
+  npm 11 may warn that the pnpm install scripts are not covered by `allowScripts`. That is expected: pnpm works without them. Check with `pnpm -v`, which should print the version above.
+
+  Do not rely on an older pnpm switching versions by itself: on Windows it can download pnpm 12 and then fail to start it. If `pnpm -v` still shows an older version, an older global pnpm comes first on `PATH`.
 
 Then, at the repository root:
 
@@ -38,6 +40,8 @@ pnpm install
 6. **Pull request** with the template filled in and `Closes #<issue>` in the description.
 7. **Review.** CI must pass and someone must approve. A reviewer agent can do the first pass, but the final approval comes from a person.
 8. **Squash merge.** The PR commits become one commit on `main`, with the PR title as its message. That is why the PR title also follows the commit convention.
+
+`main` is protected, administrators included: changes only arrive through a pull request, both CI jobs must pass, history stays linear, and force pushes and deletion are blocked. The repository only allows squash merges.
 
 ## Commit convention
 
