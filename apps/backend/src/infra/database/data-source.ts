@@ -1,4 +1,5 @@
 import { DataSource } from "typeorm";
+import { registerFoldTextFunction } from "./fold-text";
 import { CreateInitialTables1795046400000 } from "./migrations/1795046400000-create-initial-tables";
 import { AssessmentSchema } from "./schemas/assessment.schema";
 import { UserTokenSchema } from "./schemas/user-token.schema";
@@ -22,5 +23,6 @@ export function createDataSource({
     migrationsTableName: "migrations",
     synchronize: false,
     logging,
+    prepareDatabase: registerFoldTextFunction,
   });
 }

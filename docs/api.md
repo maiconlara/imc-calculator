@@ -52,15 +52,15 @@ List routes accept `page` (from 1) and `pageSize` (default 10, maximum 100) and 
 
 ### Users
 
-| Method | Route               | Who            | Description                                                                                                                               |
-| ------ | ------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| GET    | `/users`            | admin, teacher | Paginated list, with `search`, `role` and `status` filters. A teacher only gets students                                                  |
-| GET    | `/users/options`    | admin, teacher | Short list for selects. `role` is required; `onlyAssessed=true` returns only people with assessments (for a teacher, only their students) |
-| GET    | `/users/:id`        | admin, teacher | Details                                                                                                                                   |
-| POST   | `/users`            | admin, teacher | Creates (`name`, `username`, `password`, `role`, `status`)                                                                                |
-| PUT    | `/users/:id`        | admin, teacher | Edits (`name`, `username`, `role`, optional `password`)                                                                                   |
-| PATCH  | `/users/:id/status` | admin, teacher | Activates or deactivates (`status`)                                                                                                       |
-| DELETE | `/users/:id`        | admin          | Deletes a user with no linked assessments                                                                                                 |
+| Method | Route               | Who            | Description                                                                                                                                                                                                                                     |
+| ------ | ------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/users`            | admin, teacher | Paginated list in name order, with `search` (part of the name or username, ignoring letter case and accents), `role` and `status` filters. A teacher only gets students, and asking for another role is 403                                     |
+| GET    | `/users/options`    | admin, teacher | Short list for selects (`id`, `name`, `status`). `role` is required, and a teacher may only ask for `student`. `onlyAssessed=true` returns only people with assessments, as the student or as the assessor (for a teacher, only their students) |
+| GET    | `/users/:id`        | admin, teacher | Details                                                                                                                                                                                                                                         |
+| POST   | `/users`            | admin, teacher | Creates (`name`, `username`, `password`, `role`, `status`)                                                                                                                                                                                      |
+| PUT    | `/users/:id`        | admin, teacher | Edits (`name`, `username`, `role`, optional `password`)                                                                                                                                                                                         |
+| PATCH  | `/users/:id/status` | admin, teacher | Activates or deactivates (`status`)                                                                                                                                                                                                             |
+| DELETE | `/users/:id`        | admin          | Deletes a user with no linked assessments                                                                                                                                                                                                       |
 
 ### Assessments
 
@@ -96,6 +96,28 @@ Content-Type: application/json
     "username": "carla.mendes",
     "role": "teacher"
   }
+}
+```
+
+Register a student (`hasAssessments` says whether the user has assessments, as the student or as the assessor, which blocks deleting them and changing their role):
+
+```http
+POST /api/users
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+Content-Type: application/json
+
+{ "name": "Camila Duarte", "username": "Camila.Duarte", "password": "senha-da-camila", "role": "student" }
+```
+
+```json
+{
+  "id": "35c5...",
+  "name": "Camila Duarte",
+  "username": "camila.duarte",
+  "role": "student",
+  "status": "active",
+  "createdAt": "2026-11-24T17:40:57.166Z",
+  "hasAssessments": false
 }
 ```
 

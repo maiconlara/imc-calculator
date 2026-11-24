@@ -4,6 +4,7 @@
 
 | Action                                         | Administrator | Teacher           | Student               |
 | ---------------------------------------------- | ------------- | ----------------- | --------------------- |
+| See users                                      | any role      | students only     | no                    |
 | Create and edit users                          | any role      | students only     | no                    |
 | Activate and deactivate users                  | any role      | students only     | no                    |
 | Delete a user (only with no linked assessment) | yes           | no                | no                    |
@@ -19,7 +20,7 @@ The API enforces every line of this table. The panel only hides what the role ca
 
 - Nobody changes their own role or status, and nobody deletes their own account. This way there is always at least one active administrator.
 - A user with linked assessments (as a student or as the assessor) cannot be deleted and cannot change role. The panel suggests deactivating instead.
-- Changing another user's password ends that user's open sessions.
+- Changing another user's password ends that user's open sessions: they can no longer be renewed, and the access already granted lasts at most until the access token expires (15 minutes by default). Changing your own password keeps your current session.
 - Deactivating a user ends their open sessions right away, and the API checks the status on every request, so the access ends on the next action.
 
 ### User fields

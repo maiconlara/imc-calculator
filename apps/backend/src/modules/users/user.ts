@@ -10,4 +10,10 @@ export interface User {
   createdAt: Date;
 }
 
+export type NewUser = Omit<User, "id">;
+
+export type UserChanges = Partial<
+  Pick<User, "name" | "username" | "passwordHash" | "role" | "status">
+>;
+
 export type AuthenticatedUser = SessionUser;

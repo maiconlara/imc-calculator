@@ -71,6 +71,10 @@ erDiagram
 
 Reasoning in [decision 0004](../decisions/0004-database-in-portuguese-code-in-english.md).
 
+## Searching and sorting text
+
+SQLite's `LOWER` only handles ASCII letters, so `LOWER('Érica')` stays `Érica`. Searches and name sorting use `fold_text(...)` instead, an SQL function that lowercases and removes accents (`Érica` becomes `erica`). `createDataSource` registers it on every connection through TypeORM's `prepareDatabase` (`infra/database/fold-text.ts`), so it exists for the API, the commands and the tests, but not in another SQLite client: a query that uses it fails there with "no such function: fold_text".
+
 ## Migrations
 
 - Live in `apps/backend/src/infra/database/migrations` and are registered in `data-source.ts`.
