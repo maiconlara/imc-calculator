@@ -8,9 +8,12 @@
     "dev": "tsx watch src/main.ts",
     "build": "tsdown",
     "start": "node dist/main.mjs",
+    "db:migrate": "tsx src/infra/database/cli/migrate.ts",
+    "db:revert": "tsx src/infra/database/cli/revert.ts",
+    "db:migrate:prod": "node dist/migrate.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run --passWithNoTests"
+    "test": "vitest run"
   },
   "dependencies": {
     "@imc-calculator/shared": "workspace:*",

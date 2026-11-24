@@ -18,7 +18,9 @@
     "test": "pnpm -r test",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build"
+    "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
+    "db:migrate": "pnpm --filter @imc-calculator/backend db:migrate",
+    "db:revert": "pnpm --filter @imc-calculator/backend db:revert"
   },
   "devDependencies": {
     "prettier": "3.10.1"

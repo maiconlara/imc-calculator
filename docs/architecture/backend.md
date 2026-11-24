@@ -22,7 +22,8 @@ routes → controller → service → repository (interface) → TypeORM impleme
 
 ```
 src/
-├── main.ts                 starts the server and shuts it down gracefully
+├── main.ts                 loads the config and the logger, logs a failed start, handles shutdown signals
+├── server.ts               opens the database and listens; fails on a taken port or a database it cannot open
 ├── app.ts                  builds the Express app: security headers, logs, routes, error handling
 ├── container.ts            binds every interface to its implementation
 ├── config/env.ts           environment variables validated with Zod
@@ -31,7 +32,8 @@ src/
 │   ├── users/              registration, status and user permissions
 │   └── assessments/        assessments, visibility scope by role and dashboard summary
 ├── infra/
-│   ├── database/           data source, TypeORM schemas, migrations, repositories, seed
+│   ├── database/           data source, connection check, TypeORM schemas, value translation,
+│   │                       migrations, repositories, seed, and cli/ (migrate and revert commands)
 │   ├── security/           bcrypt hasher and JWT token service
 │   └── logger.ts           pino logger
 └── shared/
@@ -68,20 +70,16 @@ Express 5 forwards errors thrown by async handlers to the error handler, so cont
 
 ## Configuration
 
-Every setting comes from an environment variable, validated at startup by `config/env.ts`. The app refuses to start with an invalid value, and refuses the sample JWT secret in production. The full list with sample values is in `apps/backend/.env.example`.
+Every setting comes from an environment variable, validated at startup by `config/env.ts`, and the app refuses to start with an invalid value. The full list with sample values is in `apps/backend/.env.example`; a new setting is added to both files and to this table in the same PR.
 
-| Variable                 | Purpose                               |
-| ------------------------ | ------------------------------------- |
-| `NODE_ENV`               | `development`, `test` or `production` |
-| `PORT`                   | API port                              |
-| `LOG_LEVEL`              | pino log level                        |
-| `CORS_ORIGIN`            | Allowed origins, comma separated      |
-| `TRUST_PROXY`            | Who may report the real client IP     |
-| `DB_DATABASE`            | SQLite file path                      |
-| `JWT_ACCESS_SECRET`      | Secret used to sign the access token  |
-| `JWT_ACCESS_TTL_MINUTES` | Access token lifetime                 |
-| `REFRESH_TOKEN_TTL_DAYS` | Refresh token lifetime                |
-| `BCRYPT_ROUNDS`          | bcrypt cost                           |
+| Variable      | Purpose                               |
+| ------------- | ------------------------------------- |
+| `NODE_ENV`    | `development`, `test` or `production` |
+| `PORT`        | API port                              |
+| `LOG_LEVEL`   | pino log level                        |
+| `CORS_ORIGIN` | Allowed origins, comma separated      |
+| `TRUST_PROXY` | Who may report the real client IP     |
+| `DB_DATABASE` | SQLite file path                      |
 
 ## Adding a module
 

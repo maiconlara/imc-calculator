@@ -1,0 +1,42 @@
+import cors from "cors";
+import express, { Router, type Express } from "express";
+import helmet from "helmet";
+import { pinoHttp } from "pino-http";
+import type { Container } from "./container";
+import type { Logger } from "./infra/logger";
+import { handleErrors, handleRouteNotFound } from "./shared/http/error-handler";
+
+export interface AppOptions {
+  logger: Logger;
+  allowedOrigins: string[];
+  trustProxy: boolean | number | string;
+}
+
+const HEALTH_ROUTE = "/api/health";
+
+export function createApp(container: Container, appOptions: AppOptions): Express {
+  const app = express();
+
+  app.set("trust proxy", appOptions.trustProxy);
+  app.disable("x-powered-by");
+  app.use(helmet());
+  app.use(cors({ origin: appOptions.allowedOrigins }));
+  app.use(
+    pinoHttp({
+      logger: appOptions.logger,
+      autoLogging: { ignore: (req) => req.url === HEALTH_ROUTE },
+    }),
+  );
+  app.use(express.json({ limit: "10kb" }));
+
+  const apiRouter = Router();
+  apiRouter.get("/health", async (_req, res) => {
+    await container.checkDatabaseHealth();
+    res.json({ status: "ok" });
+  });
+
+  app.use("/api", apiRouter);
+  app.use(handleRouteNotFound);
+  app.use(handleErrors);
+  return app;
+}
