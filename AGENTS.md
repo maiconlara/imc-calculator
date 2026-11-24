@@ -47,6 +47,7 @@ Run them at the repository root:
 | `pnpm build`        | Production build of both apps                 |
 | `pnpm format`       | Formats every file with Prettier              |
 | `pnpm db:migrate`   | Applies the pending migrations                |
+| `pnpm db:revert`    | Reverts the last migration                    |
 | `pnpm db:seed`      | Recreates the database with demo data         |
 
 Before saying a task is done, `pnpm check` must pass with no errors. If it fails, say which step failed and show the output.
