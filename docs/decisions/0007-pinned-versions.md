@@ -1,6 +1,6 @@
 # 0007. Pinned versions
 
-- Status: accepted
+- Status: accepted, refined by [0008](0008-dependency-supply-chain-guards.md)
 - Date: 2026-11-23
 
 ## Context

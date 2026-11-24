@@ -85,7 +85,7 @@ Access is by username and password, for all three roles.
 
 Version policy:
 
-- Always the latest stable release of each series above.
+- Always the latest stable release of each series above that pnpm's supply chain guards accept (see [decisions/0008-dependency-supply-chain-guards.md](../decisions/0008-dependency-supply-chain-guards.md)).
 - Pinned versions in `package.json`, with no `^` or `~`, so the project runs the same on any machine.
 - Node.js declared in `engines` and in `.nvmrc`; pnpm declared in `packageManager`.
 

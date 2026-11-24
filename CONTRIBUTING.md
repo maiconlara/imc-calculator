@@ -4,8 +4,20 @@ This guide applies to people and agents. The code rules are in [AGENTS.md](AGENT
 
 ## Prerequisites
 
-- Node.js 26 (the version is in `.nvmrc`; with nvm, run `nvm use`).
-- pnpm 12. With Node's Corepack, `corepack enable` picks the version declared in the `packageManager` field of `package.json`.
+- Node.js 26, the version in `.nvmrc` (with nvm, run `nvm install` and then `nvm use`).
+- pnpm 12, the version in the `packageManager` field of `package.json`. Node.js 26 no longer ships Corepack, so install pnpm with npm:
+
+  ```bash
+  npm install -g pnpm@12.23.0
+  ```
+
+  pnpm 12 is a native binary that npm sets up during the install. An older pnpm that switches versions by itself can download pnpm 12 but fail to start it on Windows.
+
+Then, at the repository root:
+
+```bash
+pnpm install
+```
 
 ## A change from start to finish
 
@@ -75,4 +87,11 @@ docs: describe how teachers see their students
 
 ## Dependencies
 
-Versions are always pinned, with no `^` or `~`, at the latest stable release of each series. A dependency update is its own PR, `chore(deps): ...`, with the checks passing.
+Versions are always pinned, with no `^` or `~`, at the latest stable release of each series that pnpm accepts. A dependency update is its own PR, `chore(deps): ...`, with the checks passing.
+
+pnpm guards the supply chain, and those guards stay on:
+
+- **Minimum release age.** pnpm refuses a version published less than a day ago. When the newest version is that fresh, use the previous one and update later. Never add `minimumReleaseAgeExclude` to `pnpm-workspace.yaml` to get around it.
+- **Build scripts and agent skills.** A dependency only runs install scripts, or provides skills to AI agents, after an explicit decision recorded in `pnpm-workspace.yaml` (`allowBuilds` and `permissions`). When `pnpm install` reports a package awaiting approval, check why it needs it and decide in the PR, with `pnpm approve <package>` or `pnpm approve '!<package>'`.
+
+The reasoning is in [decision 0008](docs/decisions/0008-dependency-supply-chain-guards.md).
