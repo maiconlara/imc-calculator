@@ -1,0 +1,66 @@
+# Business rules
+
+## Permissions by role
+
+| Action                                         | Administrator | Teacher           | Student               |
+| ---------------------------------------------- | ------------- | ----------------- | --------------------- |
+| Create and edit users                          | any role      | students only     | no                    |
+| Activate and deactivate users                  | any role      | students only     | no                    |
+| Delete a user (only with no linked assessment) | yes           | no                | no                    |
+| Record and edit assessments                    | all           | of their students | no                    |
+| Delete assessments                             | yes           | no                | no                    |
+| See assessments                                | all           | of their students | only their own        |
+| Filter assessments by student                  | yes           | yes               | no (always their own) |
+| Filter assessments by teacher                  | yes           | no                | no                    |
+
+The API enforces every line of this table. The panel only hides what the role cannot do, so the person is never offered an action that would fail.
+
+## Users
+
+- Nobody changes their own role or status, and nobody deletes their own account. This way there is always at least one active administrator.
+- A user with linked assessments (as a student or as the assessor) cannot be deleted and cannot change role. The panel suggests deactivating instead.
+- Changing another user's password ends that user's open sessions.
+- Deactivating a user ends their open sessions right away, and the API checks the status on every request, so the access ends on the next action.
+
+## Assessments
+
+- Only active students receive new assessments. Editing an existing assessment of a student who became inactive is still allowed, to fix typing mistakes.
+- The assessor is always the signed in user who records the assessment.
+- The BMI and the classification are calculated by the API from the height and the weight. The client never sends them.
+- Accepted ranges: height from 0.50 m to 2.50 m and weight from 10 kg to 400 kg.
+
+### BMI calculation
+
+`BMI = weight / height²`, rounded to 2 decimal places. The classification uses the rounded value and the band table in [requirements.md](requirements.md). Each band includes its lower limit and excludes the lower limit of the next band.
+
+Examples:
+
+| Height | Weight | BMI   | Classification     |
+| ------ | ------ | ----- | ------------------ |
+| 1.75 m | 56 kg  | 18.29 | Abaixo do peso     |
+| 1.75 m | 70 kg  | 22.86 | Peso normal        |
+| 1.75 m | 80 kg  | 26.12 | Sobrepeso          |
+| 1.60 m | 80 kg  | 31.25 | Obesidade grau I   |
+| 1.60 m | 95 kg  | 37.11 | Obesidade grau II  |
+| 1.60 m | 110 kg | 42.97 | Obesidade grau III |
+
+## Who the teacher's students are
+
+The database has no direct link between a teacher and a student. A student becomes one of the teacher's students when the teacher records the first assessment for that student. From then on, the teacher sees the student's full history, including assessments recorded by other teachers, because progress cannot be followed with only part of the history.
+
+Any teacher can record an assessment for any active student. The reasoning and the alternatives are in [decisions/0006-teacher-students.md](../decisions/0006-teacher-students.md).
+
+## Dashboard numbers
+
+- **Active students:** students with status active.
+- **Assessments this month:** assessments created since the first day of the current month, in the server time zone.
+- **Assessed students, current average BMI and current classification:** only the latest assessment of each active student.
+- **Assessment counters:** the full history.
+
+For a teacher, every number above is limited to their students.
+
+## Sign in
+
+- A wrong username or password returns "Usuário ou senha inválidos." in both cases.
+- An inactive user with the right password gets a message telling them to contact the gym.
+- After 10 failed attempts for the same username from the same address within 10 minutes, the login is blocked until the window ends.
