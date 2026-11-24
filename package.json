@@ -1,0 +1,25 @@
+{
+  "name": "imc-calculator",
+  "version": "0.1.0",
+  "private": true,
+  "description": "BMI tracking system for gyms: Express API, Next.js panel and shared rules in a pnpm monorepo",
+  "license": "MIT",
+  "packageManager": "pnpm@12.23.0",
+  "engines": {
+    "node": ">=26.13.1 <27"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel --filter \"./apps/*\" dev",
+    "dev:backend": "pnpm --filter @imc-calculator/backend dev",
+    "dev:frontend": "pnpm --filter @imc-calculator/frontend dev",
+    "build": "pnpm -r build",
+    "lint": "pnpm -r lint",
+    "typecheck": "pnpm -r typecheck",
+    "test": "pnpm -r test",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "devDependencies": {
+    "prettier": "3.10.1"
+  }
+}

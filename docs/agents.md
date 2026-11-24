@@ -60,6 +60,7 @@ Not every task touches every layer: a screen tweak skips the shared and backend 
 - Every commit, every push and opening each pull request.
 - The final review and the merge.
 - Any change to GitHub settings, CI secrets or branch protection.
+- Adding a dependency or approving its install scripts or agent skills.
 
 Agents never merge, never force push and never turn off a check to make it pass.
 

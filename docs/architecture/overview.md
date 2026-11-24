@@ -61,5 +61,6 @@ Two common paths:
 - [0005: session in httpOnly cookies through Next.js](../decisions/0005-session-in-httponly-cookies.md)
 - [0006: who the teacher's students are](../decisions/0006-teacher-students.md)
 - [0007: pinned versions](../decisions/0007-pinned-versions.md)
+- [0008: dependency supply chain guards](../decisions/0008-dependency-supply-chain-guards.md)
 
 Details of each side: [backend.md](backend.md), [frontend.md](frontend.md), [database.md](database.md).

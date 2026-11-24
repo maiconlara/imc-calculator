@@ -2,7 +2,7 @@
 
 Web system for a gym to track the Body Mass Index (BMI, "IMC" in Portuguese) of its students. Teachers record assessments with height and weight, the system calculates and stores the BMI and its classification, and each student follows their own progress.
 
-> The project is under construction. Setup instructions arrive together with the code.
+> The project is under construction. The monorepo and its tooling are in place; the API and the panel are being added, and the instructions to run them arrive together with the code.
 
 ## What it does
 
@@ -37,6 +37,18 @@ imc-calculator/
 ├── docs/            Product, architecture, API and decision records
 ├── .claude/         Claude Code agents and skills
 └── .github/         Issue and pull request templates, CI
+```
+
+## Development
+
+Prerequisites: Node.js 26 (exact version in [.nvmrc](.nvmrc)) and pnpm 12. How to install them is in [CONTRIBUTING.md](CONTRIBUTING.md#prerequisites).
+
+```bash
+pnpm install
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
 ```
 
 ## Documentation

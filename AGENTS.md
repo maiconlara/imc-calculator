@@ -29,7 +29,7 @@ A pnpm workspaces monorepo:
 - `apps/frontend`: panel with Next.js 16 (App Router), React 19, Chakra UI 3, TanStack Query 5, React Hook Form, Zod and Axios.
 - `packages/shared`: rules and contracts used by both sides (`@imc-calculator/shared`).
 
-Exact versions live in the `package.json` files, always pinned (no `^` or `~`). Node.js 26 and pnpm 12.
+Exact versions live in the `package.json` files, always pinned (no `^` or `~`). Node.js 26 (exact version in `.nvmrc`) and pnpm 12 (in `packageManager`). Setup and dependency rules are in [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Commands
 
@@ -125,5 +125,6 @@ A summary of what must not be broken. The reasons are in the architecture docume
 
 - Commit, push, open or merge a PR without an explicit request from the person driving the session.
 - Change GitHub settings (`main` protection, permissions, CI secrets).
+- Add or upgrade a dependency, approve its install scripts or agent skills, or add a release age exception in `pnpm-workspace.yaml`.
 - Delete data, migrations or Git history.
 - Turn off a lint, TypeScript or CI check to make something pass.
