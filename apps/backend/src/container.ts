@@ -6,6 +6,7 @@ import { TypeormUserRepository } from "./infra/database/repositories/typeorm-use
 import { BcryptPasswordHasher } from "./infra/security/bcrypt-password-hasher";
 import { JsonwebtokenAccessTokenService } from "./infra/security/jsonwebtoken-access-token-service";
 import { AuthService } from "./modules/auth/auth.service";
+import { UserService } from "./modules/users/user.service";
 import { systemClock, type Clock } from "./shared/clock";
 
 export type ContainerSettings = Pick<
@@ -18,6 +19,7 @@ export type ContainerSettings = Pick<
 
 export interface AppServices {
   authService: AuthService;
+  userService: UserService;
 }
 
 export interface Container {
@@ -56,6 +58,12 @@ export function createContainer(dependencies: {
         accessTokenService,
         clock,
         refreshTokenTtlDays: env.REFRESH_TOKEN_TTL_DAYS,
+      }),
+      userService: new UserService({
+        userRepository,
+        refreshTokenRepository,
+        passwordHasher,
+        clock,
       }),
     },
     checkDatabaseHealth: () => checkDatabaseConnection(dataSource),

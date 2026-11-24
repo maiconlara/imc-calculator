@@ -6,6 +6,8 @@ import type { Container } from "./container";
 import type { Logger } from "./infra/logger";
 import { AuthController } from "./modules/auth/auth.controller";
 import { createAuthRouter, createLoginRateLimiter } from "./modules/auth/auth.routes";
+import { UserController } from "./modules/users/user.controller";
+import { createUsersRouter } from "./modules/users/user.routes";
 import { createAuthenticationMiddleware } from "./shared/http/authentication";
 import { handleErrors, handleRouteNotFound } from "./shared/http/error-handler";
 
@@ -46,6 +48,13 @@ export function createApp(container: Container, appOptions: AppOptions): Express
       controller: new AuthController(services.authService),
       authenticateRequest,
       loginRateLimiter: createLoginRateLimiter(),
+    }),
+  );
+  apiRouter.use(
+    "/users",
+    createUsersRouter({
+      controller: new UserController(services.userService),
+      authenticateRequest,
     }),
   );
 

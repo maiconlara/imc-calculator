@@ -6,6 +6,7 @@ model: opus
 maxTurns: 60
 skills:
   - add-bmi-band
+  - new-backend-module
 ---
 
 # backend-developer

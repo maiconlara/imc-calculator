@@ -34,7 +34,8 @@ src/
 │   └── assessments/        assessments, visibility scope by role and dashboard summary
 ├── infra/
 │   ├── database/           data source, connection check, TypeORM schemas, value translation,
-│   │                       migrations, repositories, seed, and cli/ (migrate and revert commands)
+│   │                       text folding (fold_text), migrations, repositories, seed,
+│   │                       and cli/ (migrate and revert commands)
 │   ├── security/           bcrypt hasher and JWT token service
 │   └── logger.ts           pino logger
 └── shared/
@@ -97,6 +98,8 @@ Every setting comes from an environment variable, validated at startup by `confi
 5. Bind everything in `container.ts` and mount the router in `app.ts`.
 6. Write end-to-end tests in `test/` covering each role.
 7. Document the endpoints in [api.md](../api.md).
+
+The users module is the model to copy. In Claude Code, the `new-backend-module` skill (`.claude/skills/new-backend-module/SKILL.md`) details each step.
 
 ## Tests
 
