@@ -37,3 +37,9 @@ export class BusinessRuleError extends AppError {
     super(message, 422);
   }
 }
+
+export class TooManyRequestsError extends AppError {
+  constructor(message: string) {
+    super(message, 429);
+  }
+}

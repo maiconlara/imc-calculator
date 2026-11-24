@@ -2,9 +2,11 @@ import { createServer, type Server } from "node:net";
 import { pino } from "pino";
 import { afterEach, describe, expect, it } from "vitest";
 import { startServer, type RunningServer } from "../src/server";
+import { TEST_SETTINGS } from "./environment";
 
 const silentLogger = pino({ level: "silent" });
 const serverSettings = {
+  ...TEST_SETTINGS,
   DB_DATABASE: ":memory:",
   CORS_ORIGIN: [],
   TRUST_PROXY: false,

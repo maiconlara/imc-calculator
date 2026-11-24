@@ -4,6 +4,9 @@ import helmet from "helmet";
 import { pinoHttp } from "pino-http";
 import type { Container } from "./container";
 import type { Logger } from "./infra/logger";
+import { AuthController } from "./modules/auth/auth.controller";
+import { createAuthRouter, createLoginRateLimiter } from "./modules/auth/auth.routes";
+import { createAuthenticationMiddleware } from "./shared/http/authentication";
 import { handleErrors, handleRouteNotFound } from "./shared/http/error-handler";
 
 export interface AppOptions {
@@ -15,6 +18,7 @@ export interface AppOptions {
 const HEALTH_ROUTE = "/api/health";
 
 export function createApp(container: Container, appOptions: AppOptions): Express {
+  const { services } = container;
   const app = express();
 
   app.set("trust proxy", appOptions.trustProxy);
@@ -29,11 +33,21 @@ export function createApp(container: Container, appOptions: AppOptions): Express
   );
   app.use(express.json({ limit: "10kb" }));
 
+  const authenticateRequest = createAuthenticationMiddleware(services.authService);
   const apiRouter = Router();
+
   apiRouter.get("/health", async (_req, res) => {
     await container.checkDatabaseHealth();
     res.json({ status: "ok" });
   });
+  apiRouter.use(
+    "/auth",
+    createAuthRouter({
+      controller: new AuthController(services.authService),
+      authenticateRequest,
+      loginRateLimiter: createLoginRateLimiter(),
+    }),
+  );
 
   app.use("/api", apiRouter);
   app.use(handleRouteNotFound);
