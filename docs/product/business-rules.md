@@ -22,6 +22,16 @@ The API enforces every line of this table. The panel only hides what the role ca
 - Changing another user's password ends that user's open sessions.
 - Deactivating a user ends their open sessions right away, and the API checks the status on every request, so the access ends on the next action.
 
+### User fields
+
+| Field    | Rule                                                                                                                                                                                                           |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Name     | 3 to 60 characters, spaces at the ends removed                                                                                                                                                                 |
+| Username | 3 to 60 characters, only lowercase letters, digits, dot, hyphen and underscore. Typed uppercase becomes lowercase, so `Maria.Silva` is stored as `maria.silva`; `maria silva` is rejected because of the space |
+| Password | 8 to 72 characters and at most 72 bytes, the limit bcrypt reads. Accented letters and symbols take more than one byte, so a long password full of them can be rejected below 72 characters                     |
+
+When editing a user, an empty password keeps the current one.
+
 ## Assessments
 
 - Only active students receive new assessments. Editing an existing assessment of a student who became inactive is still allowed, to fix typing mistakes.

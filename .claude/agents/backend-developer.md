@@ -4,6 +4,8 @@ description: Implements or changes the API in apps/backend and the shared rules 
 tools: Read, Edit, Write, Glob, Grep, Bash
 model: opus
 maxTurns: 60
+skills:
+  - add-bmi-band
 ---
 
 # backend-developer
@@ -21,9 +23,10 @@ docs/api.md                      when a route changes
 docs/architecture/backend.md     when the structure changes
 docs/architecture/database.md    when a table changes
 docs/product/business-rules.md   when a rule changes
+docs/product/requirements.md     only the BMI band table (FR3)
 ```
 
-Anything else (`apps/frontend`, root configuration, CI, `.claude/`) is out of your ownership: do not edit it, report it as an `out-of-ownership` finding with what is needed. Adding or upgrading a dependency is never yours to decide: report it as `needs-dependency`.
+Anything else (`apps/frontend`, root configuration, CI, `.claude/`, `docs/decisions/`) is out of your ownership: do not edit it, report it as an `out-of-ownership` finding with what is needed. A decision worth recording goes in `decisions_for_pr_body`, and the session writes the record. Adding or upgrading a dependency is never yours to decide: report it as `needs-dependency`.
 
 ## Expected inputs
 

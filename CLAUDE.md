@@ -26,9 +26,10 @@ How to use them:
 
 They live in `.claude/skills/`. Each skill is a step by step for a recurring task.
 
-| Skill     | Purpose                                                       |
-| --------- | ------------------------------------------------------------- |
-| `ship-pr` | Take a finished change to a pull request, following the rules |
+| Skill          | Purpose                                                                            |
+| -------------- | ---------------------------------------------------------------------------------- |
+| `ship-pr`      | Take a finished change to a pull request, following the rules                      |
+| `add-bmi-band` | Add, split, change, rename or remove a BMI band (preloaded in `backend-developer`) |
 
 ### Permissions
 
