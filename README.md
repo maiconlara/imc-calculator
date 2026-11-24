@@ -1,5 +1,7 @@
 # IMC Calculator
 
+[![CI](https://github.com/maiconlara/imc-calculator/actions/workflows/ci.yml/badge.svg)](https://github.com/maiconlara/imc-calculator/actions/workflows/ci.yml)
+
 Web system for a gym to track the Body Mass Index (BMI, "IMC" in Portuguese) of its students. Teachers record assessments with height and weight, the system calculates and stores the BMI and its classification, and each student follows their own progress.
 
 > The project is under construction. The monorepo and its tooling are in place; the API and the panel are being added, and the instructions to run them arrive together with the code.
@@ -35,7 +37,7 @@ imc-calculator/
 ├── packages/
 │   └── shared/      Rules and contracts shared by both apps
 ├── docs/            Product, architecture, API and decision records
-├── .claude/         Claude Code agents and skills
+├── .claude/         Claude Code agents, skills and permissions
 └── .github/         Issue and pull request templates, CI
 ```
 
@@ -45,11 +47,10 @@ Prerequisites: Node.js 26 (exact version in [.nvmrc](.nvmrc)) and pnpm 12. How t
 
 ```bash
 pnpm install
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
+pnpm check
 ```
+
+`pnpm check` runs format, lint, type check, tests and build, the same steps the CI runs on every pull request.
 
 ## Documentation
 

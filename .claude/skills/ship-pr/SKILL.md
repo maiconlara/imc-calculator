@@ -17,13 +17,10 @@ Follow these steps in order. Stop and ask the person driving the session wheneve
 At the repository root:
 
 ```bash
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
+pnpm check
 ```
 
-If one fails, fix it or report it. Never open a PR with a failing check.
+It runs the same steps as the CI: format, lint, type check, tests and build. If one fails, fix it or report it. Never open a PR with a failing check.
 
 Then search the changed files for the em dash character (U+2014):
 

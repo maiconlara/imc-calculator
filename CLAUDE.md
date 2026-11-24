@@ -30,9 +30,19 @@ They live in `.claude/skills/`. Each skill is a step by step for a recurring tas
 | --------- | ------------------------------------------------------------- |
 | `ship-pr` | Take a finished change to a pull request, following the rules |
 
+### Permissions
+
+`.claude/settings.json` sets what runs without asking:
+
+- **Allowed:** `pnpm check` and each of its steps, `pnpm format`, `pnpm install --frozen-lockfile`, and reading Git state (`git status`, `git diff`, `git log`).
+- **Asks first:** commits, pushes, opening a PR, and adding, removing, updating or approving dependencies.
+- **Denied:** force pushes, `git reset --hard`, merging PRs and reading `.env` files.
+
+Personal overrides go in `.claude/settings.local.json`, which Git ignores.
+
 ### Before closing a task
 
-1. Run `pnpm lint`, `pnpm typecheck`, `pnpm test` and `pnpm build`.
+1. Run `pnpm check`.
 2. Search the changed files for the em dash character (U+2014) and replace it with a comma, a colon or parentheses.
 3. Run the `code-reviewer` agent on the diff.
 4. Update the affected documentation.

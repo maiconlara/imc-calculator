@@ -14,7 +14,7 @@ Closes #
 
 ## Checklist
 
-- [ ] `pnpm lint`, `pnpm typecheck`, `pnpm test` and `pnpm build` pass
+- [ ] `pnpm check` passes (format, lint, types, tests and build)
 - [ ] New or changed rules have tests
 - [ ] New screens handle loading, error and empty states
 - [ ] Affected docs updated (`docs/`, `AGENTS.md`), with a decision record if needed

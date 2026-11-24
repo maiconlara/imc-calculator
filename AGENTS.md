@@ -35,18 +35,21 @@ Exact versions live in the `package.json` files, always pinned (no `^` or `~`). 
 
 Run them at the repository root:
 
-| Command           | What it does                                 |
-| ----------------- | -------------------------------------------- |
-| `pnpm install`    | Installs the dependencies of every package   |
-| `pnpm dev`        | Starts the API and the panel with hot reload |
-| `pnpm lint`       | ESLint on every package                      |
-| `pnpm typecheck`  | Type checking on every package               |
-| `pnpm test`       | Tests (Vitest) of every package              |
-| `pnpm build`      | Production build of both apps                |
-| `pnpm db:migrate` | Applies the pending migrations               |
-| `pnpm db:seed`    | Recreates the database with demo data        |
+| Command             | What it does                                  |
+| ------------------- | --------------------------------------------- |
+| `pnpm install`      | Installs the dependencies of every package    |
+| `pnpm dev`          | Starts the API and the panel with hot reload  |
+| `pnpm check`        | Runs every check below, in order, like the CI |
+| `pnpm format:check` | Prettier, without changing files              |
+| `pnpm lint`         | ESLint on every package                       |
+| `pnpm typecheck`    | Type checking on every package                |
+| `pnpm test`         | Tests (Vitest) of every package               |
+| `pnpm build`        | Production build of both apps                 |
+| `pnpm format`       | Formats every file with Prettier              |
+| `pnpm db:migrate`   | Applies the pending migrations                |
+| `pnpm db:seed`      | Recreates the database with demo data         |
 
-Before saying a task is done, `pnpm lint`, `pnpm typecheck`, `pnpm test` and `pnpm build` must pass with no errors. If one fails, say which one and show the output.
+Before saying a task is done, `pnpm check` must pass with no errors. If it fails, say which step failed and show the output.
 
 ## Workflow
 
@@ -117,7 +120,7 @@ A summary of what must not be broken. The reasons are in the architecture docume
 
 ## Done means
 
-- The four checks pass (`lint`, `typecheck`, `test`, `build`).
+- `pnpm check` passes (format, lint, types, tests and build), and so does the CI.
 - A new or changed rule has a test.
 - The affected documentation was updated in the same PR, and a new decision became a record in `docs/decisions/`.
 
