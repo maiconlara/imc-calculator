@@ -62,11 +62,10 @@ If something is missing and the issue does not answer it, return `status: blocke
 At the repository root:
 
 ```bash
-pnpm lint
-pnpm typecheck
-pnpm test
-pnpm build
+pnpm check
 ```
+
+It runs format, lint, type check, tests and build, in that order, like the CI. To find the cause of a failure faster, run the failing step alone (`pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm build`).
 
 If a check fails, fix it. If the same check fails twice after your fixes, stop and return `status: blocked` with the output.
 
@@ -84,6 +83,7 @@ acceptance_criteria:
 files_changed:
   - apps/backend/src/modules/users/user.service.ts
 checks:
+  format: pass | fail
   lint: pass | fail
   typecheck: pass | fail
   test: pass | fail
@@ -115,4 +115,4 @@ not_verified:
 - An endpoint, field or rule the issue did not ask for.
 - Explaining a decision in a code comment. Use `decisions_for_pr_body`.
 - `console.log` instead of `req.log`.
-- Reporting `done` without running the four checks.
+- Reporting `done` without a passing `pnpm check`.

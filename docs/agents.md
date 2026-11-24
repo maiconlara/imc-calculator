@@ -21,8 +21,9 @@ Rules are never duplicated between these files. `AGENTS.md` states a rule in one
 │   ├── backend-developer.md    API and shared package work
 │   ├── frontend-developer.md   panel work
 │   └── code-reviewer.md        read-only review of a diff
-└── skills/
-    └── ship-pr/SKILL.md        from a finished change to an open pull request
+├── skills/
+│   └── ship-pr/SKILL.md        from a finished change to an open pull request
+└── settings.json               what runs without asking, what asks first, what is denied
 ```
 
 - **Agents** are specialists with their own instructions, tools and model (Opus). The main session delegates a focused task to one of them and gets back a report. Each agent file states:
@@ -32,6 +33,8 @@ Rules are never duplicated between these files. `AGENTS.md` states a rule in one
   - **Report:** a fixed structure with the status, each acceptance criterion as changed or explained, files, check results, the API contract, findings for other owners, decisions for the PR description and what was not verified.
   - **Anti-patterns:** concrete mistakes to avoid in this code base.
 - **Skills** are step by step guides for tasks that repeat. New skills are added together with the code they teach how to change, so a skill never describes code that does not exist yet.
+- **Settings** turn the rules into guardrails: the checks run without a prompt, commits, pushes and dependency changes always ask, and force pushes, merges and `.env` reads are denied. The list is in `CLAUDE.md`.
+- **CI** runs the same `pnpm check` on GitHub for every pull request, plus a check of the PR title, so an agent's work is verified the same way as a person's.
 
 ## How a task flows
 
@@ -43,7 +46,7 @@ flowchart TD
   branch --> shared["shared: rules and schemas"]
   shared --> backend["backend-developer: API and tests"]
   backend --> frontend["frontend-developer: screens"]
-  frontend --> checks["lint, typecheck, test, build"]
+  frontend --> checks["pnpm check"]
   checks --> review["code-reviewer: findings"]
   review --> fix["Fix findings"]
   fix --> commit{"Person approves commit and push"}

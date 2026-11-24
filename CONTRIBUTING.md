@@ -33,7 +33,7 @@ pnpm install
    The name follows `<type>/<short-description>`, with the same types used in commits.
 
 3. **Small commits**, one idea each, following the convention below.
-4. **Checks** at the root: `pnpm lint`, `pnpm typecheck`, `pnpm test` and `pnpm build`.
+4. **Checks** at the root: `pnpm check`, which runs format, lint, type check, tests and build, the same steps as the CI.
 5. **Documentation.** If a behavior, endpoint, table or rule changed, update the matching document in `docs/` in the same PR. If you made a decision someone will question later, record it in `docs/decisions/`.
 6. **Pull request** with the template filled in and `Closes #<issue>` in the description.
 7. **Review.** CI must pass and someone must approve. A reviewer agent can do the first pass, but the final approval comes from a person.
@@ -58,7 +58,7 @@ pnpm install
 | `ci`       | GitHub Actions pipeline                       |
 | `perf`     | A performance gain that keeps the behavior    |
 
-Scopes: `shared`, `backend`, `frontend`, `deps`.
+Scopes: `shared`, `backend`, `frontend`, `deps`. The subject starts with a lowercase letter and has no period at the end.
 
 Examples:
 
@@ -69,9 +69,20 @@ chore(deps): update next to 16.4.7
 docs: describe how teachers see their students
 ```
 
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every pull request and on every push to `main`:
+
+| Job                  | What it checks                                                                                                                            |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
+| `Pull request title` | The title follows the commit convention above, since it becomes the commit on `main`                                                      |
+| `Checks`             | A clean install from the lockfile with the Node.js and pnpm versions the project declares, then format, lint, type check, tests and build |
+
+Third party actions are pinned to a commit SHA, with the version in a comment, so a moved tag cannot change what runs. The workflow only reads the repository.
+
 ## Definition of done
 
-- [ ] The four checks pass.
+- [ ] `pnpm check` passes, and so does the CI.
 - [ ] A new or changed rule has a test.
 - [ ] Every new screen handles loading, error and empty list.
 - [ ] Documentation is updated.
