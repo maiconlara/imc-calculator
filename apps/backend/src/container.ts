@@ -1,10 +1,12 @@
 import type { DataSource } from "typeorm";
 import type { Env } from "./config/env";
 import { checkDatabaseConnection } from "./infra/database/check-database-connection";
+import { TypeormAssessmentRepository } from "./infra/database/repositories/typeorm-assessment.repository";
 import { TypeormRefreshTokenRepository } from "./infra/database/repositories/typeorm-refresh-token.repository";
 import { TypeormUserRepository } from "./infra/database/repositories/typeorm-user.repository";
 import { BcryptPasswordHasher } from "./infra/security/bcrypt-password-hasher";
 import { JsonwebtokenAccessTokenService } from "./infra/security/jsonwebtoken-access-token-service";
+import { AssessmentService } from "./modules/assessments/assessment.service";
 import { AuthService } from "./modules/auth/auth.service";
 import { UserService } from "./modules/users/user.service";
 import { systemClock, type Clock } from "./shared/clock";
@@ -20,6 +22,7 @@ export type ContainerSettings = Pick<
 export interface AppServices {
   authService: AuthService;
   userService: UserService;
+  assessmentService: AssessmentService;
 }
 
 export interface Container {
@@ -42,6 +45,7 @@ export function createContainer(dependencies: {
 
   const userRepository = new TypeormUserRepository(dataSource);
   const refreshTokenRepository = new TypeormRefreshTokenRepository(dataSource);
+  const assessmentRepository = new TypeormAssessmentRepository(dataSource);
   const passwordHasher = new BcryptPasswordHasher(env.BCRYPT_ROUNDS);
   const accessTokenService = new JsonwebtokenAccessTokenService({
     secret: env.JWT_ACCESS_SECRET,
@@ -63,6 +67,11 @@ export function createContainer(dependencies: {
         userRepository,
         refreshTokenRepository,
         passwordHasher,
+        clock,
+      }),
+      assessmentService: new AssessmentService({
+        assessmentRepository,
+        userRepository,
         clock,
       }),
     },

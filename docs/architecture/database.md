@@ -86,4 +86,16 @@ SQLite's `LOWER` only handles ASCII letters, so `LOWER('Érica')` stays `Érica`
 
 ## Demo data
 
-`pnpm db:seed` applies the migrations and recreates the database with a demo gym: an administrator, teachers, students with assessment history, an inactive teacher, an inactive student and a student with no assessments. It deletes existing data and refuses to run with `NODE_ENV=production`.
+`pnpm db:seed` applies the migrations and recreates the database with a demo gym: an administrator, teachers, students with assessment history, an inactive teacher, an inactive student and a student with no assessments. The history reaches the month the seed runs and never goes past the moment it runs, so the dashboard always has assessments in the current month. It deletes existing data and refuses to run with `NODE_ENV=production`. Like the migration commands, it does not need the API secrets: it reads `NODE_ENV`, `LOG_LEVEL`, `DB_DATABASE` and `BCRYPT_ROUNDS`.
+
+The people and the logins live in `infra/database/demo-data.ts`:
+
+| Login             | Password   | Role                                        |
+| ----------------- | ---------- | ------------------------------------------- |
+| `admin`           | `admin123` | Administrator                               |
+| `carla.mendes`    | `prof1234` | Teacher                                     |
+| `rafael.souza`    | `prof1234` | Teacher                                     |
+| `bruno.lima`      | `prof1234` | Teacher, inactive                           |
+| `pedro.costa`     | `aluno123` | Student (and 7 other students with history) |
+| `rodrigo.pereira` | `aluno123` | Student, inactive                           |
+| `camila.duarte`   | `aluno123` | Student with no assessments                 |

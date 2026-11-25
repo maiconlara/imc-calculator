@@ -4,6 +4,8 @@ import helmet from "helmet";
 import { pinoHttp } from "pino-http";
 import type { Container } from "./container";
 import type { Logger } from "./infra/logger";
+import { AssessmentController } from "./modules/assessments/assessment.controller";
+import { createAssessmentsRouter } from "./modules/assessments/assessment.routes";
 import { AuthController } from "./modules/auth/auth.controller";
 import { createAuthRouter, createLoginRateLimiter } from "./modules/auth/auth.routes";
 import { UserController } from "./modules/users/user.controller";
@@ -54,6 +56,13 @@ export function createApp(container: Container, appOptions: AppOptions): Express
     "/users",
     createUsersRouter({
       controller: new UserController(services.userService),
+      authenticateRequest,
+    }),
+  );
+  apiRouter.use(
+    "/assessments",
+    createAssessmentsRouter({
+      controller: new AssessmentController(services.assessmentService),
       authenticateRequest,
     }),
   );

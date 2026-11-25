@@ -1,7 +1,7 @@
 import { readFileSync } from "node:fs";
 import { parseEnv } from "node:util";
 import { describe, expect, it } from "vitest";
-import { loadEnv, loadMigrationEnv, parseTrustProxy } from "./env";
+import { loadEnv, loadMigrationEnv, loadSeedEnv, parseTrustProxy } from "./env";
 
 const OWN_JWT_ACCESS_SECRET = "a-secret-of-our-own-with-more-than-32-characters";
 const requiredVariables = { JWT_ACCESS_SECRET: OWN_JWT_ACCESS_SECRET };
@@ -121,5 +121,20 @@ describe("loadMigrationEnv", () => {
 
   it("still refuses an invalid value", () => {
     expect(() => loadMigrationEnv({ DB_DATABASE: "" })).toThrow(/DB_DATABASE/);
+  });
+});
+
+describe("loadSeedEnv", () => {
+  it("adds the bcrypt cost to the database settings, without the API secrets", () => {
+    expect(loadSeedEnv({ BCRYPT_ROUNDS: "4" })).toEqual({
+      NODE_ENV: "development",
+      LOG_LEVEL: "info",
+      DB_DATABASE: "database.sqlite",
+      BCRYPT_ROUNDS: 4,
+    });
+  });
+
+  it("refuses an invalid bcrypt cost", () => {
+    expect(() => loadSeedEnv({ BCRYPT_ROUNDS: "16" })).toThrow(/BCRYPT_ROUNDS/);
   });
 });

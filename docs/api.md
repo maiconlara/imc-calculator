@@ -64,14 +64,14 @@ List routes accept `page` (from 1) and `pageSize` (default 10, maximum 100) and 
 
 ### Assessments
 
-| Method | Route                  | Who            | Description                                                                                                                 |
-| ------ | ---------------------- | -------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| GET    | `/assessments`         | signed in      | Paginated list, newest first, with `studentId`, `assessorId` and `classification` filters, limited to what the role can see |
-| GET    | `/assessments/summary` | signed in      | Dashboard numbers; with `studentId`, also that student's progress                                                           |
-| GET    | `/assessments/:id`     | signed in      | Details                                                                                                                     |
-| POST   | `/assessments`         | admin, teacher | Records (`studentId`, `height`, `weight`)                                                                                   |
-| PUT    | `/assessments/:id`     | admin, teacher | Fixes `height` and `weight` and recalculates the BMI                                                                        |
-| DELETE | `/assessments/:id`     | admin          | Deletes                                                                                                                     |
+| Method | Route                  | Who            | Description                                                                                                                                                                                                                               |
+| ------ | ---------------------- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| GET    | `/assessments`         | signed in      | Paginated list, newest first, with `studentId`, `assessorId` and `classification` filters, limited to what the role can see. Only the admin filters by `assessorId`, and a student may only ask for their own `studentId` (403 otherwise) |
+| GET    | `/assessments/summary` | signed in      | Dashboard numbers within what the role can see; with `studentId`, that student's numbers and `progress`, oldest first. A student always gets their own `progress`, and `activeStudents` is `null` for them                                |
+| GET    | `/assessments/:id`     | signed in      | Details; 404 when the role cannot see it                                                                                                                                                                                                  |
+| POST   | `/assessments`         | admin, teacher | Records (`studentId`, `height`, `weight`) for an active student. The assessor is the signed in user                                                                                                                                       |
+| PUT    | `/assessments/:id`     | admin, teacher | Fixes `height` and `weight` and recalculates the BMI, also for a student who became inactive                                                                                                                                              |
+| DELETE | `/assessments/:id`     | admin          | Deletes                                                                                                                                                                                                                                   |
 
 ## Examples
 
@@ -143,5 +143,53 @@ Content-Type: application/json
   "assessor": { "id": "5f0c...", "name": "Carla Mendes" }
 }
 ```
+
+Dashboard numbers of one student, as an administrator or a teacher sees them (`GET /api/assessments/summary?studentId=9a1e...`). A student gets the same answer for themself without `studentId`, except that `activeStudents` is `null`. The rules behind each number are in [business-rules.md](product/business-rules.md#dashboard-numbers):
+
+```json
+{
+  "totalAssessments": 3,
+  "assessmentsThisMonth": 1,
+  "assessedStudents": 1,
+  "activeStudents": 9,
+  "averageBmi": 27.43,
+  "distribution": [
+    { "classification": "underweight", "total": 0 },
+    { "classification": "normal-weight", "total": 0 },
+    { "classification": "overweight", "total": 1 },
+    { "classification": "obesity-class-1", "total": 0 },
+    { "classification": "obesity-class-2", "total": 0 },
+    { "classification": "obesity-class-3", "total": 0 }
+  ],
+  "progress": [
+    {
+      "id": "51d0...",
+      "createdAt": "2026-09-10T10:00:00.000Z",
+      "height": 1.75,
+      "weight": 94,
+      "bmi": 30.69,
+      "classification": "obesity-class-1"
+    },
+    {
+      "id": "7a2b...",
+      "createdAt": "2026-10-10T10:00:00.000Z",
+      "height": 1.75,
+      "weight": 88,
+      "bmi": 28.73,
+      "classification": "overweight"
+    },
+    {
+      "id": "c27b...",
+      "createdAt": "2026-11-10T10:00:00.000Z",
+      "height": 1.75,
+      "weight": 84,
+      "bmi": 27.43,
+      "classification": "overweight"
+    }
+  ]
+}
+```
+
+Without `studentId`, `progress` is `null` (except for a student), and `averageBmi` is `null` when no active student in scope has an assessment.
 
 The route handlers are the official source: `apps/backend/src/modules/*/*.routes.ts`. When a route changes, this page changes in the same PR.

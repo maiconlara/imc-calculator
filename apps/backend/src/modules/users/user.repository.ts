@@ -42,6 +42,7 @@ export interface UserRepository {
     pagination: Pagination,
   ): Promise<{ users: User[]; total: number }>;
   listOptions(userFilters: UserFilters & { role: Role }): Promise<UserOption[]>;
+  count(userFilters: UserFilters): Promise<number>;
   /**
    * Finds which of the given users have assessments, as the student or as the assessor.
    *

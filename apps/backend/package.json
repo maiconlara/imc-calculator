@@ -10,6 +10,7 @@
     "start": "node dist/main.mjs",
     "db:migrate": "tsx src/infra/database/cli/migrate.ts",
     "db:revert": "tsx src/infra/database/cli/revert.ts",
+    "db:seed": "tsx src/infra/database/cli/seed.ts",
     "db:migrate:prod": "node dist/migrate.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
