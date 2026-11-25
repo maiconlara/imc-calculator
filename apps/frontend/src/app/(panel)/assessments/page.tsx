@@ -1,8 +1,8 @@
 import { Suspense } from "react";
+import { NewAssessmentButton } from "@/components/assessments";
 import { AssessmentsContent } from "@/components/contents/assessments-content";
 import { PageContent, PageHeader } from "@/components/layout/page-header";
 import { ListSkeleton } from "@/components/ui/skeletons";
-import { NewAssessmentButton } from "@/components/views/new-assessment-button";
 import { permissions, type PanelAction } from "@/lib/permissions";
 import { getScreenTitle } from "@/lib/screen-titles";
 import { getScreenMetadata, requireSessionUser } from "@/lib/server/session";

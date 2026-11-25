@@ -30,6 +30,7 @@ export default defineConfig([
       "@typescript-eslint/consistent-type-imports": "error",
       "@typescript-eslint/no-explicit-any": "error",
       "no-console": "error",
+      "react/no-multi-comp": ["error", { ignoreStateless: false }],
     },
   },
   {
