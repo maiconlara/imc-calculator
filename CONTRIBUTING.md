@@ -49,7 +49,7 @@ The API refuses to start without `JWT_ACCESS_SECRET`, and refuses the sample sec
 7. **Review.** CI must pass and someone must approve. A reviewer agent can do the first pass, but the final approval comes from a person.
 8. **Squash merge.** The PR commits become one commit on `main`, with the PR title as its message. That is why the PR title also follows the commit convention.
 
-`main` is protected, administrators included: changes only arrive through a pull request, both CI jobs must pass, history stays linear, and force pushes and deletion are blocked. The repository only allows squash merges.
+`main` is protected, administrators included: changes only arrive through a pull request, the `Pull request title` and `Checks` jobs must pass, history stays linear, and force pushes and deletion are blocked. The repository only allows squash merges.
 
 ## Commit convention
 
@@ -89,6 +89,7 @@ docs: describe how teachers see their students
 | -------------------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
 | `Pull request title` | The title follows the commit convention above, since it becomes the commit on `main`                                                      |
 | `Checks`             | A clean install from the lockfile with the Node.js and pnpm versions the project declares, then format, lint, type check, tests and build |
+| `Docker images`      | Builds the API and panel images, creates the demo gym, starts them with Compose and signs in through the panel                            |
 
 Third party actions are pinned to a commit SHA, with the version in a comment, so a moved tag cannot change what runs. The workflow only reads the repository.
 

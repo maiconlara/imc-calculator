@@ -50,6 +50,8 @@ The panel server reads two settings, listed with sample values in `apps/frontend
 | `BACKEND_URL`         | API address, known only by the panel server (`http://localhost:3333/api` by default) |
 | `TRUSTED_PROXY_COUNT` | Reverse proxies in front of the panel that append the visitor address (0 by default) |
 
+The `panel` target of the root `Dockerfile` builds with `NEXT_BUILD_OUTPUT=standalone`, which makes Next.js write a self-contained server to `.next/standalone`, and runs it as the `node` user. Outside that build the output stays the default, so `next start` keeps working. In the image the session cookies are `Secure`, as in any production build (see [decisions/0011-docker-setup.md](../decisions/0011-docker-setup.md)).
+
 ## Pages
 
 1. The page (`page.tsx`) calls `requireSessionUser(screen)` with its screen, and a role `lib/permissions.ts` keeps out goes to the home screen. The session lookup is wrapped in React `cache()`, so it does not repeat the call made by the layout. `generateMetadata` returns `getScreenMetadata(screen)`, so the browser tab shows the same title.

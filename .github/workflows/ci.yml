@@ -75,3 +75,35 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+  docker-images:
+    name: Docker images
+    if: github.event_name == 'push' || github.event.action != 'edited'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out the code
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Build the API and panel images
+        run: docker compose build api panel
+
+      - name: Create the demo gym
+        run: docker compose --profile seed run --rm seed
+
+      - name: Start the API and the panel
+        run: docker compose up --detach --wait
+
+      - name: Sign in through the panel and read the dashboard numbers
+        run: |
+          curl --fail --silent --show-error --retry 10 --retry-connrefused --retry-delay 2 --output /dev/null http://localhost:3000/login
+          curl --fail --silent --show-error --output /dev/null --cookie-jar "$RUNNER_TEMP/cookies.txt" --header "Content-Type: application/json" --header "Origin: http://localhost:3000" --data '{"username":"admin","password":"admin123"}' http://localhost:3000/api/auth/login
+          curl --fail --silent --show-error --output /dev/null --cookie "$RUNNER_TEMP/cookies.txt" http://localhost:3000/api/assessments/summary
+
+      - name: Show the container logs
+        if: failure()
+        run: docker compose logs
+
+      - name: Stop the containers
+        if: always()
+        run: docker compose down --volumes
