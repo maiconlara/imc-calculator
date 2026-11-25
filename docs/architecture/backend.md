@@ -52,7 +52,7 @@ A module folder holds its routes, controller, service, repository interface, map
 - **Refresh token:** a random opaque value, stored in the `usuario_token` table only as a SHA-256 hash. It is rotated on every use, and the previous one stays valid for 30 seconds so parallel requests do not end the session.
 - `authenticateRequest` validates the token and loads the user from the database on every request. An inactive or deleted user is rejected right away.
 - `requireRole(...roles)` blocks a route for the other roles.
-- `POST /auth/login` allows 10 failed attempts per client IP and username in 10 minutes, then answers 429 until the window ends. Successful logins do not count. The panel server calls the API for every visitor and forwards the visitor IP, which is why the limit needs `TRUST_PROXY` and also counts per username.
+- `POST /auth/login` allows 10 failed attempts per client IP and username in 10 minutes, then answers 429 until the window ends. Successful logins do not count. The panel server calls the API for every visitor and forwards the visitor IP only when it sits behind a trusted reverse proxy, which is why the limit needs `TRUST_PROXY` and also counts per username. Without that proxy the API sees the panel's address for everyone, so the limit works per username alone. See [decision 0009](../decisions/0009-visitor-address-on-login.md).
 - The service repeats the role check and adds the checks that depend on data, such as "a teacher only edits students". The route is the first barrier, not the only one. See [decision 0003](../decisions/0003-backend-layers-and-dependency-injection.md).
 
 ## Errors

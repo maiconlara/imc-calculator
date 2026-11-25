@@ -22,10 +22,10 @@ A screen component never calls Axios or `fetch`. The path is always view → hoo
 
 There are two Axios instances, and both carry the session:
 
-| Instance            | Used by               | Calls                                                                                          |
-| ------------------- | --------------------- | ---------------------------------------------------------------------------------------------- |
-| `proxiedBackendApi` | hooks, in the browser | `/api/...` on the Next.js server, which adds the token from the cookie and forwards to the API |
-| `directBackendApi`  | server components     | the API directly, with the token read from the cookie, created by `getDirectBackendApi()`      |
+| Instance            | Used by               | Calls                                                                                                                |
+| ------------------- | --------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `proxiedBackendApi` | hooks, in the browser | `/api/...` on the Next.js server, which adds the token from the cookie and forwards to the API                       |
+| `directBackendApi`  | server components     | the API directly, created on the server by `createDirectBackendApi(accessToken)` with the token read from the cookie |
 
 A read function in a service accepts `{ signal, directBackendApi }` and uses `options.directBackendApi ?? proxiedBackendApi`. A write function only uses `proxiedBackendApi`, because the server never writes.
 
@@ -35,16 +35,30 @@ A read function in a service accepts `{ signal, directBackendApi }` and uses `op
 - The browser calls `/api/...`, and the `app/api/[...path]` route handler forwards the call to the API with the token. Login, logout and the session expired redirect have their own route handlers under `app/api/auth/`.
 - `proxy.ts` runs before every page and API call. When only the refresh cookie is left, it renews the session before the page renders, so server components always see a valid token.
 - A 401 seen by `proxiedBackendApi` sends the user back to the login screen.
+- When the API fails while `proxy.ts` renews the session, the refresh cookie is kept: an API call gets the API's error, and a page shows its error screen, whose "Tentar de novo" button tries again.
+- Requests that change data (and the login and logout) must come from the panel's own origin, on top of the `SameSite=Lax` cookies.
+- On login, the panel passes the visitor address to the API only when `TRUSTED_PROXY_COUNT` says a reverse proxy wrote it, because Next.js keeps an `X-Forwarded-For` written by the visitor. See [decision 0009](../decisions/0009-visitor-address-on-login.md).
+
+## Configuration
+
+The panel server reads two settings, listed with sample values in `apps/frontend/.env.example`. Next.js loads them from `apps/frontend/.env.local` when it exists, and both have defaults that work in development. The panel listens on port 3000, or on `PORT` when it is set.
+
+| Variable              | Purpose                                                                              |
+| --------------------- | ------------------------------------------------------------------------------------ |
+| `BACKEND_URL`         | API address, known only by the panel server (`http://localhost:3333/api` by default) |
+| `TRUSTED_PROXY_COUNT` | Reverse proxies in front of the panel that append the visitor address (0 by default) |
 
 ## Pages
 
-1. The page (`page.tsx`) calls `requireSessionUser()` with the roles allowed to open it. The function is wrapped in React `cache()`, so it does not repeat the call made by the layout.
-2. It renders the `PageHeader` right away, since the title and the main button depend only on the role.
+1. The page (`page.tsx`) calls `requireSessionUser(screen)` with its screen, and a role `lib/permissions.ts` keeps out goes to the home screen. The session lookup is wrapped in React `cache()`, so it does not repeat the call made by the layout. `generateMetadata` returns `getScreenMetadata(screen)`, so the browser tab shows the same title.
+2. It renders the `PageHeader` right away, with `getScreenTitle(screen, role)`, since the title and the main button depend only on the role.
 3. It wraps the content in `<Suspense>` with the skeleton of that screen.
 4. The content component (`UsersContent`, `AssessmentsContent`, `DashboardContent`) fetches the data on the server with `queryClient.query(...).catch(noop)` and returns the view inside a `HydrationBoundary`. `prefetchQuery`, `fetchQuery` and `ensureQueryData` are deprecated in TanStack Query 5 and are not used.
 5. The filters used by the server fetch and by the view come from the same constant in `lib/initial-filters.ts`. If they differ, the cache key does not match and the browser shows the skeleton again.
 
 There is no `loading.tsx` in the `(panel)` group: it would swap the whole page, header included, for a skeleton.
+
+When a page cannot be built (the API is down or answers an unexpected error), `(panel)/error.tsx` shows `PageLoadError` inside the panel, with the menu. An error in the panel layout itself, such as the session lookup, is caught by `app/error.tsx`, which shows the same screen. Its button calls `retry()`, which fetches the page again from the server.
 
 ## Screen states
 
@@ -62,6 +76,8 @@ An error must never look like an empty list: "no users yet" when the API is down
 ## Permissions
 
 `lib/permissions.ts` is the single place that says which role sees each screen and each action. The menu, the page guard (`requireSessionUser`) and the buttons read from it. The API enforces the same rules again; the panel only avoids offering an action that would fail.
+
+The screens themselves are listed once in `lib/routes.ts` (`PANEL_SCREENS` and their `PANEL_ROUTES`), and their titles for each role in `lib/screen-titles.ts`, which the menu, the page header and the browser tab share. A new screen gets an entry in each of these files and in the sidebar (`SCREEN_NAV_GROUPS` and `SCREEN_ICONS` in `components/layout/app-sidebar.tsx`), and the type checker points out any one that is missing.
 
 ## Forms
 
@@ -92,3 +108,7 @@ Before writing markup that already exists on another screen, look here first.
 - Constants used by server pages cannot live in a `"use client"` file.
 - No `any` and no Lodash.
 - Visual identity: yellow `brand` with black text, graphite (`graphite` token) in the menu and highlights, uppercase titles with the `heading` font, small labels in `mono`. Yellow is never used as text color on a white background (low contrast).
+
+## Tests
+
+Vitest runs the tests in Node. The functions in `lib/` have unit tests. The route handlers under `app/api/` and `proxy.ts` run against a small fake API (`src/test-support/fake-backend.ts`) that records each request and answers like the real one, so the cookies, the session renewal and the headers sent to the API are checked from the panel side.
