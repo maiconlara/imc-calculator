@@ -49,7 +49,7 @@ The API refuses to start without `JWT_ACCESS_SECRET`, and refuses the sample sec
 7. **Review.** CI must pass and someone must approve. A reviewer agent can do the first pass, but the final approval comes from a person.
 8. **Squash merge.** The PR commits become one commit on `main`, with the PR title as its message. That is why the PR title also follows the commit convention.
 
-`main` is protected, administrators included: changes only arrive through a pull request, the `Pull request title` and `Checks` jobs must pass, history stays linear, and force pushes and deletion are blocked. The repository only allows squash merges.
+`main` is protected, administrators included: changes only arrive through a pull request, the `Pull request title`, `Checks` and `Docker images` jobs must pass, history stays linear, and force pushes and deletion are blocked. The repository only allows squash merges.
 
 ## Commit convention
 
