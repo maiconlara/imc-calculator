@@ -32,6 +32,10 @@ They live in `.claude/skills/`. Each skill is a step by step for a recurring tas
 | `add-bmi-band`       | Add, split, change, rename or remove a BMI band (preloaded in `backend-developer`)          |
 | `new-backend-module` | Create a new API resource with every layer and its tests (preloaded in `backend-developer`) |
 
+### Previews
+
+`.claude/launch.json` starts the API (`backend`, port 3333) and the panel (`frontend`, port 3000) with hot reload, for the Claude Code preview panes. The API needs `apps/backend/.env` and a database: follow the steps in the README first.
+
 ### Permissions
 
 `.claude/settings.json` sets what runs without asking:

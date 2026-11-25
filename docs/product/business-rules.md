@@ -75,4 +75,4 @@ For a teacher, every number except active students is limited to their students.
 
 - A wrong username or password returns "Usuário ou senha inválidos." in both cases.
 - An inactive user with the right password gets a message telling them to contact the gym.
-- After 10 failed attempts for the same username from the same address within 10 minutes, the login is blocked until the window ends.
+- After 10 failed attempts for the same username from the same address within 10 minutes, the login is blocked until the window ends. When the panel has no reverse proxy in front of it, every visitor counts as the same address, so the block applies to the username for everyone ([decision 0009](../decisions/0009-visitor-address-on-login.md)).

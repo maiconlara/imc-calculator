@@ -25,6 +25,7 @@ Rules are never duplicated between these files. `AGENTS.md` states a rule in one
 │   ├── ship-pr/SKILL.md        from a finished change to an open pull request
 │   ├── add-bmi-band/SKILL.md   add, split, change, rename or remove a BMI band
 │   └── new-backend-module/SKILL.md   a new API resource with every layer and its tests
+├── launch.json                 how to start the API and the panel for the preview panes
 └── settings.json               what runs without asking, what asks first, what is denied
 ```
 

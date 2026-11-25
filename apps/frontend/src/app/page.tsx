@@ -1,8 +1,6 @@
+import { redirect } from "next/navigation";
+import { HOME_ROUTE } from "@/lib/routes";
+
 export default function Home() {
-  return (
-    <main>
-      <h1>IMC Calculator</h1>
-      <p>Painel em construção.</p>
-    </main>
-  );
+  redirect(HOME_ROUTE);
 }
