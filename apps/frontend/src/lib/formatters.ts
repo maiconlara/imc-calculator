@@ -1,4 +1,6 @@
-import { GYM_TIME_ZONE } from "@imc-calculator/shared";
+import { GYM_TIME_ZONE, roundTo } from "@imc-calculator/shared";
+
+const MINUS_SIGN = "−";
 
 const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
   day: "2-digit",
@@ -60,6 +62,38 @@ export function formatHeight(height: number): string {
   return `${formatNumber(height, 2)} m`;
 }
 
+export type ChangeDirection = "up" | "down" | "flat";
+
+/**
+ * Tells whether a change went up, went down or stayed flat once rounded to the
+ * decimals shown, so the arrow next to a number always agrees with it.
+ *
+ * @param change - Difference between the latest and the first value.
+ * @param decimals - Decimal places shown.
+ * @returns `"flat"` when the change rounds to zero.
+ */
+export function getChangeDirection(change: number, decimals: number): ChangeDirection {
+  if (roundTo(Math.abs(change), decimals) === 0) return "flat";
+  return change > 0 ? "up" : "down";
+}
+
+/**
+ * Formats a change between two measures with its sign: "+" when it went up and the
+ * minus sign (U+2212) when it went down. A change that rounds to zero has no sign.
+ *
+ * @param change - Difference between the latest and the first value.
+ * @param decimals - Decimal places shown.
+ * @param suffix - Text added after the number, such as " kg".
+ * @returns The signed change, such as "+1,5 kg" or "−0,84".
+ */
+export function formatChange(change: number, decimals = 1, suffix = ""): string {
+  const changeDirection = getChangeDirection(change, decimals);
+  const amount = formatNumber(roundTo(Math.abs(change), decimals), decimals);
+  if (changeDirection === "flat") return `${amount}${suffix}`;
+  const sign = changeDirection === "up" ? "+" : MINUS_SIGN;
+  return `${sign}${amount}${suffix}`;
+}
+
 /**
  * Applies the height mask `0,00`: the first digit is the meters, so typing "171"
  * shows "1,71". Pasting "1.71" or "1,71" gives the same result.
@@ -115,6 +149,16 @@ export function getInitials(name: string): string {
   const firstInitial = nameParts[0]?.charAt(0) ?? "";
   const lastInitial = nameParts.length > 1 ? (nameParts.at(-1)?.charAt(0) ?? "") : "";
   return `${firstInitial}${lastInitial}`.toUpperCase();
+}
+
+/**
+ * Takes the first word of a name, used to greet the signed in user.
+ *
+ * @param name - Full name.
+ * @returns The first name, or an empty text when the name is blank.
+ */
+export function getFirstName(name: string): string {
+  return name.trim().split(/\s+/)[0] ?? "";
 }
 
 /**
