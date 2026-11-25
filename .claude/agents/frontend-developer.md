@@ -49,7 +49,7 @@ If something is missing and the issue does not answer it, return `status: blocke
 2. `queries/`: query keys and `queryOptions`.
 3. `hooks/<domain>/`: one hook per file, exported through the folder `index.ts`. Mutations invalidate users and assessments together.
 4. `components/ui/`: only what is missing.
-5. `components/views/`: the client screen, split into small components instead of `render*` helpers.
+5. `components/views/<name>-view/`: the client screen as a folder. The main file exports only the view and only assembles it; columns, row components, cards, filters, dialogs and the screen's UI state hooks each get their own file. One component per `.tsx` file, always: `react/no-multi-comp` fails the lint otherwise.
 6. `components/contents/`: the server fetch with `queryClient.query(...).catch(noop)` and `HydrationBoundary`, with filters from `lib/initial-filters.ts`.
 7. `app/(panel)/<route>/page.tsx`: `requireSessionUser` with the allowed roles, `PageHeader` right away, content in `Suspense` with the screen skeleton.
 8. `lib/permissions.ts`: any new screen or action and the roles that may use it. The menu, the page and the buttons read from here.
@@ -79,9 +79,9 @@ summary: "One sentence on what changed."
 acceptance_criteria:
   - criterion: "A teacher sees only students in the users list"
     action: changed | not_changed
-    evidence: "users-view.tsx:40; checked in the browser as carla.mendes"
+    evidence: "users-view/users-filter-bar.tsx:40; checked in the browser as carla.mendes"
 files_changed:
-  - apps/frontend/src/components/views/users-view.tsx
+  - apps/frontend/src/components/views/users-view/users-filter-bar.tsx
 components:
   reused: [DataTable, FormDialog, ConfirmDialog]
   created: []
@@ -106,6 +106,9 @@ not_verified:
 
 ## Anti-patterns
 
+- A second component in the same `.tsx` file, or a screen file that also defines its rows, cards, columns or dialogs.
+- One screen importing another screen's folder. A piece two screens need moves to `components/<domain>/` (for example `components/assessments/`), so a page never loads a screen it does not show.
+- The same list logic written again in another screen (page reset on filter, step back after removing the last row, the "selected item plus dialog open" pair) instead of `useListPagination` and `useDialogTarget`.
 - `axios`, `fetch` or an inline `queryFn` inside a component instead of a hook.
 - `if (sessionUser.role === "admin")` in a component instead of a function from `lib/permissions.ts`.
 - An error shown as an empty list: `rows={usersQuery.data?.items ?? []}` with no error state means "no users yet" when the API is down.

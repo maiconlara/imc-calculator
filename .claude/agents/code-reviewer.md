@@ -30,7 +30,7 @@ Start with `git diff main...HEAD` and `git log main..HEAD --oneline`. Then check
    - Frontend: API calls only through hooks and services; permissions only from `lib/permissions.ts`.
    - Shared: no rule duplicated in an app.
 5. **Screen states.** Every screen and block that loads data handles loading, error with retry, empty and empty because of a filter. An error must never render as an empty list.
-6. **Reuse.** Markup or logic copied from another screen or route that should be a shared component or function.
+6. **Reuse and file responsibility.** Markup or logic copied from another screen or route that should be a shared component, hook or function. A file with more than one responsibility, such as a screen file that also defines its rows, cards, columns or dialogs.
 7. **Team rules** from `AGENTS.md`: naming, no `any`, no `useEffect` outside `useDebounce`, no Lodash, no `console`, no comments other than short English JSDoc, no em dash character (U+2014).
 8. **Tests.** New or changed rules have tests, including the forbidden path for each role.
 9. **Docs.** The affected docs were updated, and a questionable decision has a record in `docs/decisions/`.

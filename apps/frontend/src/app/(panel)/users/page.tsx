@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { UsersContent } from "@/components/contents/users-content";
 import { PageContent, PageHeader } from "@/components/layout/page-header";
 import { ListSkeleton } from "@/components/ui/skeletons";
-import { NewUserButton } from "@/components/views/new-user-button";
+import { NewUserButton } from "@/components/views/users-view";
 import { permissions } from "@/lib/permissions";
 import { getScreenTitle } from "@/lib/screen-titles";
 import { getScreenMetadata, requireSessionUser } from "@/lib/server/session";

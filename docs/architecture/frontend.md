@@ -9,12 +9,23 @@ services/            one file per domain, one function per endpoint (Axios)
 queries/             TanStack Query keys and query options, used on the server and in the browser
 hooks/               one folder per domain, one hook per file (hooks/users/use-get-users.ts)
 components/ui/       reusable pieces: table, dialogs, form field, badges, filters, charts
+components/assessments/ assessment pieces used by more than one screen: new assessment button, form dialog, user options select, empty state
 components/views/    client screens that use the hooks
 components/contents/ async server components that fetch the data and hydrate a view
 app/(panel)/*        server pages: check the session and render the header right away
 ```
 
 `services`, `queries` and `hooks` each have an `index.ts` and are imported through it (`@/services`, `@/queries`, `@/hooks`).
+
+## Files and folders
+
+Every file has one responsibility, and a `.tsx` file holds exactly one component. The lint rule `react/no-multi-comp` enforces it, so a second component in a file fails `pnpm lint`.
+
+- A component that has parts becomes a folder with the same name as the component, one file per part, and an `index.ts` that re-exports only what code outside the folder imports. The import path stays the same: `@/components/ui/data-table` resolves to `components/ui/data-table/index.ts`.
+- Each screen is a folder under `components/views/`, named after the view (`users-view/`, `assessments-view/`, `dashboard-view/`, `login-screen/`). The main file exports only the view and only assembles the screen. Columns, row components, cards, filters, dialogs and the screen's UI state hooks live in their own files in that folder, and a part with its own parts gets a sub-folder (`users-view/user-form-dialog/`).
+- A screen never imports another screen's folder. A domain piece that a second screen also needs moves out of the screen folder to `components/<domain>/`, as the assessment pieces did to `components/assessments/`: the dashboard shows the new assessment button and the assessments empty state, and importing them from `views/assessments-view` made the dashboard page load the whole assessments screen.
+- Files are named after what they export, in kebab-case (`user-card.tsx` exports `UserCard`). Types shared by the files of one folder live in a `<name>.types.ts` file.
+- A pure helper that is exported, tested or used by more than one file gets its own `.ts` file, next to its component or in `lib/` when it is not tied to one screen.
 
 A screen component never calls Axios or `fetch`. The path is always view → hook → query options → service.
 
@@ -98,7 +109,7 @@ The numbers and the classification read the same summary query, so a failed summ
 
 The `seeGymNumbers` action (administrator and teacher) decides which dashboard a role gets: the gym numbers, or the student's own progress. The page skeleton, the server fetch, the view and the dashboard icon in the menu read it. Wording that changes with the role without being a permission lives in `lib/screen-titles.ts`: `getManagedUserNoun` on the users screen, and `getAssessedStudentsLabel` on the dashboard ("Seus alunos avaliados" for a teacher, whose numbers, except active students, cover only their students).
 
-The screens themselves are listed once in `lib/routes.ts` (`PANEL_SCREENS` and their `PANEL_ROUTES`), and their titles for each role in `lib/screen-titles.ts`, which the menu, the page header and the browser tab share. A new screen gets an entry in each of these files and in the sidebar (`SCREEN_NAV_GROUPS` and `SCREEN_ICONS` in `components/layout/app-sidebar.tsx`), and the type checker points out any one that is missing.
+The screens themselves are listed once in `lib/routes.ts` (`PANEL_SCREENS` and their `PANEL_ROUTES`), and their titles for each role in `lib/screen-titles.ts`, which the menu, the page header and the browser tab share. A new screen gets an entry in each of these files and in the sidebar (`SCREEN_NAV_GROUPS` and `SCREEN_ICONS` in `components/layout/app-sidebar/sidebar-navigation.ts`), and the type checker points out any one that is missing.
 
 ## Forms
 
@@ -131,8 +142,17 @@ The screens themselves are listed once in `lib/routes.ts` (`PANEL_SCREENS` and t
 | `ManagerStatCardsGrid`, `ManagerPanelsGrid`, `ProgressStatsGrid` | Layout of the dashboard blocks, shared by the views and their skeletons so the page does not jump when the data arrives                                                  |
 | `ListSkeleton`, `ManagerDashboardSkeleton`, `MyProgressSkeleton` | Placeholder of a list page or of a dashboard while the server fetches it                                                                                                 |
 | `StatCardSkeleton`, `PanelRowsSkeleton`                          | Loading state of a single dashboard block when the browser fetches it again                                                                                              |
+| `RowActions`                                                     | Edit and delete buttons of a list row; each button only shows when the screen passes its handler, so the screen decides what each role may do                            |
+| `ListCard`                                                       | Shell of the card that replaces a table row on phones: main information on top, status and row actions at the bottom                                                     |
 
-Before writing markup that already exists on another screen, look here first.
+Screen logic shared by the lists lives in hooks, exported from `@/hooks`:
+
+| Hook                | Used for                                                                                                                                                  |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `useListPagination` | Page state of a filtered list: a filter change goes back to the first page, and removing the last row of a page steps back to the previous one            |
+| `useDialogTarget`   | The item a dialog acts on and whether the dialog is open; the item stays set while the dialog closes, so its content does not vanish during the animation |
+
+Before writing markup or list logic that already exists on another screen, look here first.
 
 ## Rules
 

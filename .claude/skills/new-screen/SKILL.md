@@ -13,10 +13,30 @@ services/<name>.service.ts                                  one function per end
 queries/<name>.queries.ts                                   query keys and queryOptions
 hooks/<name>/use-*.ts                                       one hook per file
 lib/initial-filters.ts                                      filters shared by server and browser
-components/views/<name>-view.tsx                            the client screen
-components/views/<name>-form-dialog.tsx                     the create and edit form
+components/views/<name>-view/                               the client screen, one file per part
+components/views/<name>-view/<name>-form-dialog/            the create and edit form
 components/contents/<name>-content.tsx                      the server fetch
 app/(panel)/<route>/page.tsx                                the page
+```
+
+Every `.tsx` file holds one component (`react/no-multi-comp` fails the lint otherwise). The users screen folder shows the split:
+
+```
+components/views/users-view/
+├── index.ts                      re-exports UsersView and NewUserButton, the only parts used outside
+├── users-view.tsx                UsersView: only assembles hooks, filter bar, table and dialogs
+├── users-view.types.ts           the row context and row props types
+├── use-filter-users.ts           filters and page (useListPagination)
+├── use-confirm-user-actions.ts   the confirmation flow (useDialogTarget)
+├── get-user-confirmation-copy.ts the wording of each confirmation, with its test
+├── get-user-columns.tsx          the table columns
+├── users-filter-bar.tsx          FilterBar with the screen's filters
+├── user-row-actions.tsx          RowActions with the per-row permissions
+├── user-card.tsx                 the phone card (ListCard)
+├── user-avatar.tsx, user-name.tsx, user-status-control.tsx   parts of a row
+├── user-confirm-dialog.tsx       ConfirmDialog with the confirmation copy
+├── new-user-button.tsx           the main button of the page header
+└── user-form-dialog/             UserFormDialog and UserForm
 ```
 
 The `frontend-developer` agent owns every step under `apps/frontend` and `docs/architecture/frontend.md`. A missing endpoint or a rule that both sides need is a finding for the `backend-developer`.
@@ -30,7 +50,7 @@ Before any code: the route, the title for each role, who opens it, the actions a
 - `lib/routes.ts`: add the screen to `PANEL_SCREENS` and its path to `PANEL_ROUTES`.
 - `lib/permissions.ts`: the roles in `SCREEN_ROLES`, and each new action in `PANEL_ACTIONS` and `ACTION_ROLES`, mirroring `docs/product/business-rules.md`. Components ask `permissions.canPerform(role, action)`; never write `role === "admin"` in a component.
 - `lib/screen-titles.ts`: the title for each role.
-- `components/layout/app-sidebar.tsx`: the menu group in `SCREEN_NAV_GROUPS` and the icon in `SCREEN_ICONS`.
+- `components/layout/app-sidebar/sidebar-navigation.ts`: the menu group in `SCREEN_NAV_GROUPS` and the icon in `SCREEN_ICONS`.
 
 The type checker points out any of these that is missing.
 
@@ -43,18 +63,19 @@ The type checker points out any of these that is missing.
 
 ## 4. The view
 
-`components/views/<name>-view.tsx` is a `"use client"` component that reads the session with `useSessionUser()` and the data with the hooks. It never calls Axios or `fetch`.
+`components/views/<name>-view/<name>-view.tsx` is a `"use client"` component that reads the session with `useSessionUser()` and the data with the hooks, and only assembles the parts of its folder. It never calls Axios or `fetch`.
 
 - Lists use `DataTable`: it requires `loadError` and `onRetry`, and takes `emptyState`, `filteredEmptyState`, `hasActiveFilters`, `onClearFilters`, `pagination`, `itemNoun` and, for phones, `renderCard`. Use `hideBelow` on secondary columns so the actions stay visible at 1024 px.
+- The page and the filters live in a `use-filter-<name>.ts` hook built on `useListPagination`, and every dialog that acts on a row uses `useDialogTarget`. Do not write the page reset or the "selected item plus dialog open" pair again.
 - Filters use `FilterBar` and `FilterSelect` (generic over the values, so no `as` cast), and a search field takes the `maxLength` of the shared schema. The search text goes through `useDebounce`.
 - A select that loads people uses `PersonSelect`, which handles its own four states.
-- Each part of a row is a small component (`UserActions`, `UserCard`) that receives a `rowContext` object with the handlers and the permissions, never a `render*` helper.
+- Each part of a row is a small component in its own file (`UserRowActions` on top of `RowActions`, `UserCard` on top of `ListCard`) that receives a `rowContext` object with the handlers and the permissions, never a `render*` helper.
 - Destructive or sensitive actions go through `ConfirmDialog`. Success and general errors become toasts with `notify`.
 - Labels, badges and status use the shared pieces (`FormField`, the `monoLabel` text style, `RoleBadge`, `ClassificationBadge`, `UserStatusIndicator`, `StateMessage`, `LoadErrorMessage`) instead of new markup.
 
 ## 5. The form
 
-`components/views/<name>-form-dialog.tsx` creates and edits with the same form:
+`components/views/<name>-view/<name>-form-dialog/` creates and edits with the same form, with the dialog and the form in separate files:
 
 - `FormDialog` is the shell (it mounts the form on each open, so `defaultValues` are always right) and `FormDialogForm` holds the fields, Cancelar and the submit button.
 - `useForm` with `zodResolver` and the shared schema, so the panel shows the same messages as the API.

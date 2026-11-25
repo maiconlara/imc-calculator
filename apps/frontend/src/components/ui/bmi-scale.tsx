@@ -1,29 +1,12 @@
 import { Box, Flex, Text } from "@chakra-ui/react";
-import { BMI_CLASSIFICATION_LABELS, BMI_RANGES } from "@imc-calculator/shared";
+import { BMI_CLASSIFICATION_LABELS } from "@imc-calculator/shared";
+import {
+  BMI_SCALE_SEGMENTS,
+  BMI_SCALE_TICK_VALUES,
+  getBmiScalePositionPercent,
+} from "@/lib/bmi-scale";
 import { CLASSIFICATION_VISUALS } from "@/lib/classification-visuals";
 import { formatBmi } from "@/lib/formatters";
-
-const SCALE_MIN_BMI = 15;
-const SCALE_MAX_BMI = 45;
-const SCALE_BMI_SPAN = SCALE_MAX_BMI - SCALE_MIN_BMI;
-
-function getScalePositionPercent(bmi: number): number {
-  const bmiInsideScale = Math.min(SCALE_MAX_BMI, Math.max(SCALE_MIN_BMI, bmi));
-  return ((bmiInsideScale - SCALE_MIN_BMI) / SCALE_BMI_SPAN) * 100;
-}
-
-const SCALE_SEGMENTS = BMI_RANGES.map((bmiRange) => {
-  const segmentStart = bmiRange.min ?? SCALE_MIN_BMI;
-  const segmentEnd = bmiRange.max ?? SCALE_MAX_BMI;
-  return {
-    ...bmiRange,
-    widthPercent: ((segmentEnd - segmentStart) / SCALE_BMI_SPAN) * 100,
-  };
-});
-
-const SCALE_TICK_VALUES = BMI_RANGES.flatMap((bmiRange) =>
-  bmiRange.min === null ? [] : [bmiRange.min],
-);
 
 /**
  * Horizontal BMI ruler with the WHO bands and a marker on the given value.
@@ -45,7 +28,7 @@ export function BmiScale({ bmi }: { bmi?: number | null }) {
         <Flex
           position="absolute"
           top="0"
-          left={`${getScalePositionPercent(bmi)}%`}
+          left={`${getBmiScalePositionPercent(bmi)}%`}
           transform="translateX(-50%)"
           direction="column"
           align="center"
@@ -77,7 +60,7 @@ export function BmiScale({ bmi }: { bmi?: number | null }) {
       ) : null}
 
       <Flex h="3.5" gap="2px" borderRadius="full" overflow="hidden">
-        {SCALE_SEGMENTS.map((scaleSegment) => (
+        {BMI_SCALE_SEGMENTS.map((scaleSegment) => (
           <Box
             key={scaleSegment.classification}
             flex={`${scaleSegment.widthPercent} 0 0`}
@@ -88,11 +71,11 @@ export function BmiScale({ bmi }: { bmi?: number | null }) {
       </Flex>
 
       <Box position="relative" mt="1.5" h="4">
-        {SCALE_TICK_VALUES.map((tickValue) => (
+        {BMI_SCALE_TICK_VALUES.map((tickValue) => (
           <Text
             key={tickValue}
             position="absolute"
-            left={`${getScalePositionPercent(tickValue)}%`}
+            left={`${getBmiScalePositionPercent(tickValue)}%`}
             transform="translateX(-50%)"
             fontFamily="mono"
             fontSize="2xs"

@@ -99,7 +99,8 @@ A summary of what must not be broken. The reasons are in the architecture docume
 - Layers: `services` (Axios, one function per endpoint) → `queries` (TanStack Query keys and options) → `hooks` (one per file) → `components/views` (screens) → `components/contents` (server-side fetch) → `app/(panel)` (pages).
 - A screen component never calls the API directly: always hook → service.
 - Every screen handles four states: loading, error (with a way to retry), empty list and empty list because of a filter.
-- An element used on more than one screen becomes a component in `components/ui`. Never copy and paste between screens.
+- One responsibility per file: a `.tsx` file holds exactly one component (the lint rule `react/no-multi-comp` blocks a second one). A component with parts becomes a folder with the same name, one file per part and an `index.ts` that re-exports what the rest of the code imports. Each screen is a folder under `components/views/` (for example `components/views/users-view/`), whose main file only assembles the screen.
+- An element used on more than one screen becomes a component in `components/ui` (or in `components/<domain>/` when it belongs to one domain, such as `components/assessments/`), and repeated screen logic becomes a hook in `hooks/`. A screen never imports another screen's folder. Never copy and paste between screens.
 - The same form handles create and edit.
 - Who can see each screen and each action comes from one place: `lib/permissions.ts`. The menu, the pages and the buttons read from it.
 - Session tokens live in `httpOnly` cookies. The browser never sees a token.

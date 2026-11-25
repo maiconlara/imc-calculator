@@ -1,7 +1,8 @@
 "use client";
 
-import { Button, EmptyState, VStack } from "@chakra-ui/react";
+import { Button } from "@chakra-ui/react";
 import { ServerCrash } from "lucide-react";
+import { StateMessage } from "@/components/ui/state-message";
 
 /**
  * Error screen of a page that could not be built, with a button that fetches the page
@@ -11,22 +12,16 @@ import { ServerCrash } from "lucide-react";
  */
 export function PageLoadError({ retry }: { retry: () => void }) {
   return (
-    <EmptyState.Root py="24">
-      <EmptyState.Content>
-        <EmptyState.Indicator>
-          <ServerCrash />
-        </EmptyState.Indicator>
-        <VStack textAlign="center" gap="1">
-          <EmptyState.Title>Não foi possível carregar esta página</EmptyState.Title>
-          <EmptyState.Description>
-            O servidor não respondeu como esperado. Confira se a API está no ar e tente de
-            novo.
-          </EmptyState.Description>
-        </VStack>
+    <StateMessage
+      icon={ServerCrash}
+      title="Não foi possível carregar esta página"
+      description="O servidor não respondeu como esperado. Confira se a API está no ar e tente de novo."
+      isFullPage
+      action={
         <Button colorPalette="brand" onClick={() => retry()}>
           Tentar de novo
         </Button>
-      </EmptyState.Content>
-    </EmptyState.Root>
+      }
+    />
   );
 }
