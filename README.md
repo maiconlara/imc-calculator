@@ -4,15 +4,13 @@
 
 Web system for a gym to track the Body Mass Index (BMI, "IMC" in Portuguese) of its students. Teachers record assessments with height and weight, the system calculates and stores the BMI and its classification, and each student follows their own progress.
 
-> The project is under construction. The API is complete; the panel has its login and its menu for each role, and its screens are being added.
-
 ## What it does
 
-| Role          | Can                                                                                        |
-| ------------- | ------------------------------------------------------------------------------------------ |
-| Administrator | Register, edit, activate, deactivate and delete users of any role; manage every assessment |
-| Teacher       | Register and edit students; record and edit assessments; see their students' history       |
-| Student       | See their own assessments and progress                                                     |
+| Role          | Can                                                                                                                 |
+| ------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Administrator | Register, edit, activate, deactivate and delete users of any role; manage every assessment; see the gym's dashboard |
+| Teacher       | Register and edit students; record and edit assessments; see their students' history and dashboard                  |
+| Student       | See their own assessments and progress                                                                              |
 
 Inactive users cannot sign in and cannot receive new assessments. The full rules are in [docs/product/business-rules.md](docs/product/business-rules.md).
 
@@ -52,7 +50,7 @@ pnpm check
 
 `pnpm check` runs format, lint, type check, tests and build, the same steps the CI runs on every pull request.
 
-### Running the API
+### Running the system
 
 1. Create the API settings from the sample, whose values work for development:
 
@@ -66,21 +64,33 @@ pnpm check
    pnpm db:seed
    ```
 
-3. Start the API with hot reload on `http://localhost:3333/api`:
+3. Start the API and the panel with hot reload:
 
    ```bash
-   pnpm dev:backend
+   pnpm dev
    ```
 
-4. Sign in as a teacher and use the returned `accessToken` as `Authorization: Bearer <accessToken>` on the other routes:
+   The API answers on `http://localhost:3333/api` and the panel on `http://localhost:3000`. `pnpm dev:backend` and `pnpm dev:frontend` start only one of them. The panel settings are in `apps/frontend/.env.example`, and the defaults work in development.
 
-   ```bash
-   curl -X POST http://localhost:3333/api/auth/login -H "Content-Type: application/json" -d '{"username":"carla.mendes","password":"prof1234"}'
-   ```
+4. Open `http://localhost:3000` and sign in with one of the demo logins:
 
-The other demo logins are listed in [docs/architecture/database.md](docs/architecture/database.md#demo-data), and every route is in the [API reference](docs/api.md). `pnpm db:migrate` alone applies new migrations without touching the data.
+   | Login          | Password   | What it shows                                                     |
+   | -------------- | ---------- | ----------------------------------------------------------------- |
+   | `admin`        | `admin123` | The whole gym: dashboard, users of every role and all assessments |
+   | `carla.mendes` | `prof1234` | A teacher: the dashboard of their students, students, assessments |
+   | `pedro.costa`  | `aluno123` | A student: their own progress and assessments                     |
 
-With the API running, `pnpm dev:frontend` starts the panel on `http://localhost:3000`, where the same logins work (or `pnpm dev` starts both). Its settings are in `apps/frontend/.env.example`, and the defaults work in development.
+   The full list, with inactive users and a student with no assessments, is in [docs/architecture/database.md](docs/architecture/database.md#demo-data). `pnpm db:migrate` alone applies new migrations without touching the data.
+
+### Calling the API directly
+
+Sign in and use the returned `accessToken` as `Authorization: Bearer <accessToken>` on the other routes:
+
+```bash
+curl -X POST http://localhost:3333/api/auth/login -H "Content-Type: application/json" -d '{"username":"carla.mendes","password":"prof1234"}'
+```
+
+Every route is in the [API reference](docs/api.md).
 
 ## Documentation
 

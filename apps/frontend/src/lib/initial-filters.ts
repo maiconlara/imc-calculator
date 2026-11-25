@@ -14,6 +14,11 @@ export const INITIAL_ASSESSMENTS_FILTERS = {
   pageSize: 10,
 } as const satisfies ListAssessmentsFilters;
 
+export const LATEST_ASSESSMENTS_FILTERS = {
+  page: 1,
+  pageSize: 6,
+} as const satisfies ListAssessmentsFilters;
+
 export const ASSESSED_STUDENT_OPTIONS_FILTERS: UserOptionsFilters = {
   role: "student",
   onlyAssessed: true,

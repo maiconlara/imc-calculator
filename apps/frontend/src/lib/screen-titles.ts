@@ -22,6 +22,12 @@ const MANAGED_USER_NOUNS: Record<Role, ManagedUserNoun> = {
   student: { singular: "usuário", plural: "usuários" },
 };
 
+const ASSESSED_STUDENTS_LABELS: Record<Role, string> = {
+  admin: "Alunos avaliados",
+  teacher: "Seus alunos avaliados",
+  student: "Alunos avaliados",
+};
+
 /**
  * Names a screen the same way in the menu, in the page header and in the browser tab.
  *
@@ -42,4 +48,15 @@ export function getScreenTitle(screen: PanelScreen, role: Role): string {
  */
 export function getManagedUserNoun(role: Role): ManagedUserNoun {
   return MANAGED_USER_NOUNS[role];
+}
+
+/**
+ * Names the assessed students card of the dashboard: a teacher's numbers, except
+ * active students, cover only their own students, so the card says "Seus alunos avaliados".
+ *
+ * @param role - Role of the signed in user.
+ * @returns The card label shown to that role.
+ */
+export function getAssessedStudentsLabel(role: Role): string {
+  return ASSESSED_STUDENTS_LABELS[role];
 }

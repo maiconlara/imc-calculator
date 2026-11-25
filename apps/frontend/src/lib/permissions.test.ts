@@ -7,7 +7,11 @@ import {
   type PanelAction,
 } from "./permissions";
 import { PANEL_SCREENS, type PanelScreen } from "./routes";
-import { getManagedUserNoun, getScreenTitle } from "./screen-titles";
+import {
+  getAssessedStudentsLabel,
+  getManagedUserNoun,
+  getScreenTitle,
+} from "./screen-titles";
 
 describe("permissions.canOpenScreen", () => {
   it.each<[Role, PanelScreen[]]>([
@@ -35,6 +39,7 @@ describe("permissions.canPerform", () => {
         "deleteAssessments",
         "filterAssessmentsByStudent",
         "filterAssessmentsByTeacher",
+        "seeGymNumbers",
       ],
     ],
     [
@@ -44,6 +49,7 @@ describe("permissions.canPerform", () => {
         "recordAssessments",
         "editAssessments",
         "filterAssessmentsByStudent",
+        "seeGymNumbers",
       ],
     ],
     ["student", []],
@@ -88,6 +94,13 @@ describe("getManagedUserNoun", () => {
       singular: "usuário",
       plural: "usuários",
     });
+  });
+});
+
+describe("getAssessedStudentsLabel", () => {
+  it("tells the teacher the number covers only their students", () => {
+    expect(getAssessedStudentsLabel("teacher")).toBe("Seus alunos avaliados");
+    expect(getAssessedStudentsLabel("admin")).toBe("Alunos avaliados");
   });
 });
 

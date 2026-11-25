@@ -1,16 +1,20 @@
 import { describe, expect, it } from "vitest";
 import {
   formatBmi,
+  formatChange,
   formatDate,
   formatDateTime,
   formatHeight,
   formatMonth,
   formatWeight,
+  getChangeDirection,
+  getFirstName,
   getInitials,
   maskHeight,
   parseDecimal,
   pluralize,
   sanitizeWeight,
+  type ChangeDirection,
 } from "./formatters";
 
 describe("getInitials", () => {
@@ -22,6 +26,57 @@ describe("getInitials", () => {
     ["Érica Santos", "ÉS"],
   ])("turns %j into %j", (name, initials) => {
     expect(getInitials(name)).toBe(initials);
+  });
+});
+
+describe("getFirstName", () => {
+  it.each([
+    ["Pedro Henrique Costa", "Pedro"],
+    ["  ana   oliveira ", "ana"],
+    ["admin", "admin"],
+    ["   ", ""],
+  ])("turns %j into %j", (name, firstName) => {
+    expect(getFirstName(name)).toBe(firstName);
+  });
+});
+
+describe("getChangeDirection", () => {
+  it.each<[number, number, ChangeDirection]>([
+    [2.5, 1, "up"],
+    [-6, 1, "down"],
+    [0, 1, "flat"],
+    [0.04, 1, "flat"],
+    [-0.004, 2, "flat"],
+    [0.05, 1, "up"],
+    [-0.05, 1, "down"],
+  ])("reads a change of %s with %s decimals as %s", (change, decimals, direction) => {
+    expect(getChangeDirection(change, decimals)).toBe(direction);
+  });
+});
+
+describe("formatChange", () => {
+  it("marks a rise with a plus sign", () => {
+    expect(formatChange(2.5, 1, " kg")).toBe("+2,5 kg");
+  });
+
+  it("marks a drop with the minus sign, not a hyphen", () => {
+    expect(formatChange(-6, 1, " kg")).toBe("−6,0 kg");
+    expect(formatChange(-1.9600000000000009, 2)).toBe("−1,96");
+  });
+
+  it("shows no sign when the change rounds to zero", () => {
+    expect(formatChange(0)).toBe("0,0");
+    expect(formatChange(0.04, 1, " kg")).toBe("0,0 kg");
+    expect(formatChange(-0.004, 2)).toBe("0,00");
+  });
+
+  it("rounds a drop and a rise of the same size alike", () => {
+    expect(formatChange(0.05)).toBe("+0,1");
+    expect(formatChange(-0.05)).toBe("−0,1");
+  });
+
+  it("uses one decimal and no suffix by default", () => {
+    expect(formatChange(3)).toBe("+3,0");
   });
 });
 

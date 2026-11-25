@@ -1,5 +1,9 @@
+import { Suspense } from "react";
+import { DashboardContent } from "@/components/contents/dashboard-content";
 import { PageContent, PageHeader } from "@/components/layout/page-header";
-import { ScreenPlaceholder } from "@/components/layout/screen-placeholder";
+import { ManagerDashboardSkeleton, MyProgressSkeleton } from "@/components/ui/skeletons";
+import { NewAssessmentButton } from "@/components/views/new-assessment-button";
+import { permissions } from "@/lib/permissions";
 import { getScreenTitle } from "@/lib/screen-titles";
 import { getScreenMetadata, requireSessionUser } from "@/lib/server/session";
 
@@ -9,12 +13,26 @@ export function generateMetadata() {
 
 export default async function DashboardPage() {
   const sessionUser = await requireSessionUser("dashboard");
+  const canSeeGymNumbers = permissions.canPerform(sessionUser.role, "seeGymNumbers");
 
   return (
     <>
-      <PageHeader title={getScreenTitle("dashboard", sessionUser.role)} />
+      <PageHeader
+        title={getScreenTitle("dashboard", sessionUser.role)}
+        actions={
+          permissions.canPerform(sessionUser.role, "recordAssessments") ? (
+            <NewAssessmentButton />
+          ) : null
+        }
+      />
       <PageContent>
-        <ScreenPlaceholder />
+        <Suspense
+          fallback={
+            canSeeGymNumbers ? <ManagerDashboardSkeleton /> : <MyProgressSkeleton />
+          }
+        >
+          <DashboardContent role={sessionUser.role} />
+        </Suspense>
       </PageContent>
     </>
   );

@@ -9,6 +9,7 @@ export const PANEL_ACTIONS = [
   "deleteAssessments",
   "filterAssessmentsByStudent",
   "filterAssessmentsByTeacher",
+  "seeGymNumbers",
 ] as const;
 
 export type PanelAction = (typeof PANEL_ACTIONS)[number];
@@ -27,6 +28,7 @@ const ACTION_ROLES: Record<PanelAction, readonly Role[]> = {
   deleteAssessments: ["admin"],
   filterAssessmentsByStudent: ["admin", "teacher"],
   filterAssessmentsByTeacher: ["admin"],
+  seeGymNumbers: ["admin", "teacher"],
 };
 
 const MANAGEABLE_ROLES: Record<Role, readonly Role[]> = {

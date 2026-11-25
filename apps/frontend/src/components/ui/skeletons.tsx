@@ -1,4 +1,106 @@
-import { Box, Flex, Skeleton, Stack } from "@chakra-ui/react";
+import { Box, Card, Flex, Skeleton, Stack } from "@chakra-ui/react";
+import { BMI_RANGES } from "@imc-calculator/shared";
+import { LATEST_ASSESSMENTS_FILTERS } from "@/lib/initial-filters";
+import {
+  MANAGER_STAT_CARD_COUNT,
+  ManagerPanelsGrid,
+  ManagerStatCardsGrid,
+  ProgressStatsGrid,
+} from "./dashboard-grids";
+
+/**
+ * Placeholder of a `StatCard` while its number loads.
+ */
+export function StatCardSkeleton() {
+  return (
+    <Card.Root variant="outline" borderRadius="l3" bg="bg.panel" h="full">
+      <Card.Body p="5" gap="3">
+        <Flex justify="space-between" align="start" gap="3">
+          <Skeleton h="3" w="24" />
+          <Skeleton boxSize="9" borderRadius="l2" />
+        </Flex>
+        <Skeleton h="9" w="20" />
+        <Skeleton h="3" w="40" maxW="full" />
+      </Card.Body>
+    </Card.Root>
+  );
+}
+
+/**
+ * Placeholder rows of a block inside a `Panel` while its data loads.
+ *
+ * @param rows - Number of rows.
+ * @param rowHeight - Height token of each row.
+ * @param label - What is loading, read by screen readers.
+ */
+export function PanelRowsSkeleton({
+  rows,
+  rowHeight,
+  label,
+}: {
+  rows: number;
+  rowHeight: string;
+  label?: string;
+}) {
+  return (
+    <Stack gap="4" aria-busy={label ? "true" : undefined} aria-label={label}>
+      {Array.from({ length: rows }, (_, index) => (
+        <Skeleton key={index} h={rowHeight} />
+      ))}
+    </Stack>
+  );
+}
+
+function PanelSkeleton({ rows, rowHeight }: { rows: number; rowHeight: string }) {
+  return (
+    <Card.Root variant="outline" borderRadius="l3" bg="bg.panel" h="full">
+      <Card.Header pb="0">
+        <Skeleton h="4" w="40" />
+        <Skeleton h="3" w="64" maxW="full" mt="2" />
+      </Card.Header>
+      <Card.Body>
+        <PanelRowsSkeleton rows={rows} rowHeight={rowHeight} />
+      </Card.Body>
+    </Card.Root>
+  );
+}
+
+/**
+ * Placeholder of the dashboard of administrators and teachers: the four numbers, the
+ * BMI distribution and the latest assessments.
+ */
+export function ManagerDashboardSkeleton() {
+  return (
+    <Stack gap="6" aria-busy="true" aria-label="Carregando o dashboard">
+      <ManagerStatCardsGrid>
+        {Array.from({ length: MANAGER_STAT_CARD_COUNT }, (_, index) => (
+          <StatCardSkeleton key={index} />
+        ))}
+      </ManagerStatCardsGrid>
+      <ManagerPanelsGrid>
+        <PanelSkeleton rows={BMI_RANGES.length} rowHeight="9" />
+        <PanelSkeleton rows={LATEST_ASSESSMENTS_FILTERS.pageSize} rowHeight="10" />
+      </ManagerPanelsGrid>
+    </Stack>
+  );
+}
+
+/**
+ * Placeholder of the student's own progress: the current BMI header, the changes, the
+ * BMI scale and the chart.
+ */
+export function MyProgressSkeleton() {
+  return (
+    <Stack gap="6" aria-busy="true" aria-label="Carregando sua evolução">
+      <Skeleton h={{ base: "64", md: "44" }} borderRadius="l3" />
+      <ProgressStatsGrid bmiScale={<PanelSkeleton rows={1} rowHeight="10" />}>
+        <StatCardSkeleton />
+        <StatCardSkeleton />
+      </ProgressStatsGrid>
+      <PanelSkeleton rows={1} rowHeight="64" />
+    </Stack>
+  );
+}
 
 function FilterFieldSkeleton({ width }: { width: string }) {
   return (

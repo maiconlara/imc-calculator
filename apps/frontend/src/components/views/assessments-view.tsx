@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Box, Card, Flex, HStack, IconButton, Skeleton, Text } from "@chakra-ui/react";
-import { ClipboardList, Pencil, SearchX, Trash2 } from "lucide-react";
+import { Pencil, SearchX, Trash2 } from "lucide-react";
 import {
   BMI_CLASSIFICATIONS,
   BMI_CLASSIFICATION_LABELS,
@@ -35,7 +35,7 @@ import {
 } from "@/lib/initial-filters";
 import { permissions } from "@/lib/permissions";
 import { AssessmentFormDialog } from "./assessment-form-dialog";
-import { NewAssessmentButton } from "./new-assessment-button";
+import { getAssessmentsEmptyState } from "./assessments-empty-state";
 
 const ASSESSMENT_NOUN = { singular: "avaliação", plural: "avaliações" };
 
@@ -55,10 +55,6 @@ interface AssessmentRowContext {
 
 export function AssessmentsView() {
   const sessionUser = useSessionUser();
-  const canRecordAssessments = permissions.canPerform(
-    sessionUser.role,
-    "recordAssessments",
-  );
   const canFilterByStudent = permissions.canPerform(
     sessionUser.role,
     "filterAssessmentsByStudent",
@@ -258,14 +254,7 @@ export function AssessmentsView() {
         isRefreshing={assessmentsQuery.isPlaceholderData}
         loadError={assessmentsQuery.error}
         onRetry={() => void assessmentsQuery.refetch()}
-        emptyState={{
-          icon: ClipboardList,
-          title: "Nenhuma avaliação ainda",
-          description: canRecordAssessments
-            ? "Registre a primeira avaliação para acompanhar a evolução dos alunos."
-            : "Assim que um professor avaliar você, o resultado aparece aqui.",
-          action: canRecordAssessments ? <NewAssessmentButton /> : undefined,
-        }}
+        emptyState={getAssessmentsEmptyState(sessionUser.role)}
         filteredEmptyState={{
           icon: SearchX,
           title: "Nenhuma avaliação com esses filtros",

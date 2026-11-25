@@ -2,18 +2,19 @@
 
 ## Permissions by role
 
-| Action                                         | Administrator      | Teacher            | Student               |
-| ---------------------------------------------- | ------------------ | ------------------ | --------------------- |
-| See users                                      | any role           | students only      | no                    |
-| Create and edit users                          | any role           | students only      | no                    |
-| Activate and deactivate users                  | any role           | students only      | no                    |
-| Delete a user (only with no linked assessment) | yes                | no                 | no                    |
-| Record assessments                             | any active student | any active student | no                    |
-| Edit assessments                               | all                | of their students  | no                    |
-| Delete assessments                             | yes                | no                 | no                    |
-| See assessments                                | all                | of their students  | only their own        |
-| Filter assessments by student                  | yes                | yes                | no (always their own) |
-| Filter assessments by teacher                  | yes                | no                 | no                    |
+| Action                                         | Administrator      | Teacher                                         | Student               |
+| ---------------------------------------------- | ------------------ | ----------------------------------------------- | --------------------- |
+| See users                                      | any role           | students only                                   | no                    |
+| Create and edit users                          | any role           | students only                                   | no                    |
+| Activate and deactivate users                  | any role           | students only                                   | no                    |
+| Delete a user (only with no linked assessment) | yes                | no                                              | no                    |
+| Record assessments                             | any active student | any active student                              | no                    |
+| Edit assessments                               | all                | of their students                               | no                    |
+| Delete assessments                             | yes                | no                                              | no                    |
+| See assessments                                | all                | of their students                               | only their own        |
+| Filter assessments by student                  | yes                | yes                                             | no (always their own) |
+| Filter assessments by teacher                  | yes                | no                                              | no                    |
+| See the gym numbers on the dashboard           | all                | of their students, except active students (all) | no (own progress)     |
 
 The API enforces every line of this table. The panel only hides what the role cannot do, so the person is never offered an action that would fail. A filter the role cannot use answers 403 instead of being ignored: a teacher or a student filtering by teacher, or a student asking for another student.
 

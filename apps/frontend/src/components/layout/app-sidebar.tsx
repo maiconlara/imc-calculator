@@ -42,7 +42,8 @@ const SCREEN_NAV_GROUPS: Record<PanelScreen, NavGroupLabel> = {
 };
 
 const SCREEN_ICONS: Record<PanelScreen, (role: Role) => ComponentType<LucideProps>> = {
-  dashboard: (role) => (role === "student" ? TrendingUp : LayoutDashboard),
+  dashboard: (role) =>
+    permissions.canPerform(role, "seeGymNumbers") ? LayoutDashboard : TrendingUp,
   assessments: () => ClipboardList,
   users: () => Users,
 };

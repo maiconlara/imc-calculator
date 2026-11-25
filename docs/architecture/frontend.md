@@ -77,9 +77,24 @@ An error must never look like an empty list: "no users yet" when the API is down
 
 `DataTable` draws the four states itself: it requires `loadError` and `onRetry`, and receives `emptyState`, `filteredEmptyState` (which comes with a "Limpar filtros" button) and `hasActiveFilters`. `hasActiveFilters` reflects the filters the rows were fetched with (the debounced search, not the text still being typed), and an empty list that is refreshing shows the skeleton, so clearing a search that found nobody never flashes "nothing registered yet". When a deletion or a status change leaves the current page past the last one, it offers to go back to the last page. `PersonSelect` does the same inside its list: loading, failed load with "Tentar de novo", nobody registered, and nobody matching the typed name. A failed refresh keeps the people already loaded selectable; the error shows only when there is nobody to list. A block outside a table, such as the progress chart of a student, uses `LoadErrorMessage` for its error.
 
+### Dashboard
+
+The dashboard has no table, so each block draws its own states. Administrators and teachers see the gym numbers; a student sees their own progress ("Minha evolução"). The server fetches the summary for everyone and the latest assessments only for the roles that see the gym numbers, with `LATEST_ASSESSMENTS_FILTERS`.
+
+| Block                                   | Loading                                  | Error                                         | Empty                                                                                          |
+| --------------------------------------- | ---------------------------------------- | --------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| The four numbers (`StatCard`)           | `StatCardSkeleton` in place of each card | One `LoadErrorMessage` in place of the cards  | Zeros, and `--` for the average BMI when no active student was assessed                        |
+| Classificação atual                     | `PanelRowsSkeleton`, one row per band    | `LoadErrorMessage` inside the panel           | "Nenhum aluno avaliado ainda"                                                                  |
+| Últimas avaliações                      | `PanelRowsSkeleton`                      | `LoadErrorMessage` inside the panel           | "Nenhuma avaliação ainda", the same state as the assessments list (`getAssessmentsEmptyState`) |
+| Minha evolução (header, changes, chart) | `MyProgressSkeleton`                     | `LoadErrorMessage` in place of the whole view | "Você ainda não tem avaliações", only on a successful answer with no progress                  |
+
+The numbers and the classification read the same summary query, so a failed summary shows the error in both blocks, and either "Tentar de novo" fetches it again. The dashboard has no filters, so it has no filtered empty state.
+
 ## Permissions
 
 `lib/permissions.ts` is the single place that says which role sees each screen and each action. The menu, the page guard (`requireSessionUser`) and the buttons read from it. Screens use `permissions.canOpenScreen(role, screen)`; actions use `permissions.canPerform(role, action)`, with the actions listed in `PANEL_ACTIONS` and their roles in one table that mirrors [business-rules.md](../product/business-rules.md). `permissions.getManageableRoles(role)` lists the roles a user may create and edit, and `permissions.canChooseUserRole(role)` says whether the role filter, the role column and the role choice show. Components never compare `role` themselves. The API enforces the same rules again; the panel only avoids offering an action that would fail.
+
+The `seeGymNumbers` action (administrator and teacher) decides which dashboard a role gets: the gym numbers, or the student's own progress. The page skeleton, the server fetch, the view and the dashboard icon in the menu read it. Wording that changes with the role without being a permission lives in `lib/screen-titles.ts`: `getManagedUserNoun` on the users screen, and `getAssessedStudentsLabel` on the dashboard ("Seus alunos avaliados" for a teacher, whose numbers, except active students, cover only their students).
 
 The screens themselves are listed once in `lib/routes.ts` (`PANEL_SCREENS` and their `PANEL_ROUTES`), and their titles for each role in `lib/screen-titles.ts`, which the menu, the page header and the browser tab share. A new screen gets an entry in each of these files and in the sidebar (`SCREEN_NAV_GROUPS` and `SCREEN_ICONS` in `components/layout/app-sidebar.tsx`), and the type checker points out any one that is missing.
 
@@ -95,21 +110,25 @@ The screens themselves are listed once in `lib/routes.ts` (`PANEL_SCREENS` and t
 
 ## Reusable components
 
-| Component                          | Used for                                                                                                                                                                 |
-| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `DataTable`                        | Lists with pagination and the four screen states; on phones each row becomes a card (`renderCard`), so key columns and actions are never hidden behind a sideways scroll |
-| `FormDialog`, `FormDialogForm`     | The dialog shell shared by every create and edit form, and its fields and footer                                                                                         |
-| `ConfirmDialog`                    | Confirming destructive or sensitive actions                                                                                                                              |
-| `FormField`                        | Label, required mark, helper text and error message of a field                                                                                                           |
-| `PageHeader`, `PageContent`        | Title, main actions and page spacing                                                                                                                                     |
-| `FilterBar`, `FilterSelect`        | Search and fixed list filters with a clear button; `FilterSelect` returns the value with the type of its options                                                         |
-| `PersonSelect`                     | Searchable choice of a person loaded from `/users/options`, with the four states and the status of inactive people                                                       |
-| `StateMessage`, `LoadErrorMessage` | Empty, filtered and failed states of a block; the error one shows the reason and "Tentar de novo"                                                                        |
-| `UserStatusIndicator`              | Active or inactive status (Chakra `Status`), shown on the signed in user's own row and next to inactive people in `PersonSelect`                                         |
-| `RoleBadge`, `ClassificationBadge` | Role and BMI classification labels with their colors                                                                                                                     |
-| `Panel`                            | Card with a title and description around a chart or a summary                                                                                                            |
-| `ProgressChart`, `BmiScale`        | BMI or weight over time, and the BMI ruler with the band colors                                                                                                          |
-| `ListSkeleton`                     | Placeholder of a list page while the server fetches it                                                                                                                   |
+| Component                                                        | Used for                                                                                                                                                                 |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `DataTable`                                                      | Lists with pagination and the four screen states; on phones each row becomes a card (`renderCard`), so key columns and actions are never hidden behind a sideways scroll |
+| `FormDialog`, `FormDialogForm`                                   | The dialog shell shared by every create and edit form, and its fields and footer                                                                                         |
+| `ConfirmDialog`                                                  | Confirming destructive or sensitive actions                                                                                                                              |
+| `FormField`                                                      | Label, required mark, helper text and error message of a field                                                                                                           |
+| `PageHeader`, `PageContent`                                      | Title, main actions and page spacing                                                                                                                                     |
+| `FilterBar`, `FilterSelect`                                      | Search and fixed list filters with a clear button; `FilterSelect` returns the value with the type of its options                                                         |
+| `PersonSelect`                                                   | Searchable choice of a person loaded from `/users/options`, with the four states and the status of inactive people                                                       |
+| `StateMessage`, `LoadErrorMessage`                               | Empty, filtered and failed states of a block; the error one shows the reason and "Tentar de novo"                                                                        |
+| `UserStatusIndicator`                                            | Active or inactive status (Chakra `Status`), shown on the signed in user's own row and next to inactive people in `PersonSelect`                                         |
+| `RoleBadge`, `ClassificationBadge`                               | Role and BMI classification labels with their colors                                                                                                                     |
+| `Panel`                                                          | Card with a title and description around a chart or a summary                                                                                                            |
+| `ProgressChart`, `BmiScale`                                      | BMI or weight over time, and the BMI ruler with the band colors                                                                                                          |
+| `StatCard`                                                       | One dashboard number with its label, icon and hint; the value arrives already formatted by `lib/formatters.ts`                                                           |
+| `BmiDistribution`                                                | Students per BMI band: one bar per row of the shared band table, in its order, with the colors of `lib/classification-visuals.ts`                                        |
+| `ManagerStatCardsGrid`, `ManagerPanelsGrid`, `ProgressStatsGrid` | Layout of the dashboard blocks, shared by the views and their skeletons so the page does not jump when the data arrives                                                  |
+| `ListSkeleton`, `ManagerDashboardSkeleton`, `MyProgressSkeleton` | Placeholder of a list page or of a dashboard while the server fetches it                                                                                                 |
+| `StatCardSkeleton`, `PanelRowsSkeleton`                          | Loading state of a single dashboard block when the browser fetches it again                                                                                              |
 
 Before writing markup that already exists on another screen, look here first.
 
@@ -120,6 +139,7 @@ Before writing markup that already exists on another screen, look here first.
 - No `any` and no Lodash.
 - Visual identity: yellow `brand` with black text, graphite (`graphite` token) in the menu and highlights, uppercase titles with the `heading` font. Yellow is never used as text color on a white background (low contrast).
 - Small uppercase labels (field labels, table headers, menu groups, "(você)") use the theme text style `textStyle="monoLabel"` and set only their color (`fg.muted`, or `whiteAlpha.600` on graphite). Its weight is `medium`, the same the Field and Table recipes use, so the label looks the same everywhere.
+- Numbers on screen go through `lib/formatters.ts`: `formatNumber` for counts, `formatBmi`, `formatWeight` and `formatHeight` for measures, and `formatChange` for a change between two assessments, with "+" for a rise, the minus sign (U+2212) for a drop and no sign when it rounds to zero.
 - Dates are shown in the gym time zone, `GYM_TIME_ZONE` from the shared package (`lib/formatters.ts`), so the server render and the browser render show the same day and hour, and they match the month the API counts in "assessments this month". See [decisions/0010-gym-time-zone.md](../decisions/0010-gym-time-zone.md).
 
 ## Adding a screen
