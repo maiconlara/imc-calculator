@@ -1,6 +1,11 @@
 import { AxiosError, AxiosHeaders, type AxiosResponse } from "axios";
 import { describe, expect, it } from "vitest";
-import { getErrorMessage, getErrorStatus, shouldRetryQuery } from "./api-errors";
+import {
+  getErrorMessage,
+  getErrorStatus,
+  getFieldErrors,
+  shouldRetryQuery,
+} from "./api-errors";
 
 function buildAxiosError(status?: number, data?: unknown): AxiosError {
   const response: AxiosResponse | undefined =
@@ -40,6 +45,31 @@ describe("getErrorMessage", () => {
       "Algo deu errado. Tente de novo.",
     );
     expect(getErrorMessage("unexpected", "Não deu certo.")).toBe("Não deu certo.");
+  });
+});
+
+describe("getFieldErrors", () => {
+  const ASSESSMENT_FORM_FIELDS = ["studentId", "height", "weight"] as const;
+
+  it("keeps the issues of the fields the form has", () => {
+    const validationError = buildAxiosError(400, {
+      message: "Dados inválidos. Confira os campos destacados.",
+      issues: [
+        { path: "height", message: "A altura máxima é 2,50 m" },
+        { path: "status", message: "Selecione a situação" },
+      ],
+    });
+
+    expect(getFieldErrors(validationError, ASSESSMENT_FORM_FIELDS)).toEqual([
+      { fieldName: "height", message: "A altura máxima é 2,50 m" },
+    ]);
+  });
+
+  it("returns nothing for an error without issues", () => {
+    expect(
+      getFieldErrors(buildAxiosError(409, { message: "Em uso." }), ["name"]),
+    ).toEqual([]);
+    expect(getFieldErrors(new Error("offline"), ["name"])).toEqual([]);
   });
 });
 

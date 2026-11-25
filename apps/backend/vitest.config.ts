@@ -4,6 +4,6 @@ export default defineConfig({
   test: {
     environment: "node",
     include: ["src/**/*.test.ts", "test/**/*.test.ts"],
-    env: { TZ: "America/Sao_Paulo" },
+    env: { TZ: "UTC" },
   },
 });

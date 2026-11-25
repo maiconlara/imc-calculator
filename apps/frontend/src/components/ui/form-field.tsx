@@ -9,15 +9,6 @@ interface FormFieldProps {
   children: ReactNode;
 }
 
-export const FIELD_LABEL_STYLE = {
-  fontFamily: "mono",
-  fontSize: "2xs",
-  fontWeight: "600",
-  textTransform: "uppercase",
-  letterSpacing: "wider",
-  color: "fg.muted",
-} as const;
-
 export function FormField({
   label,
   errorMessage,
@@ -27,7 +18,7 @@ export function FormField({
 }: FormFieldProps) {
   return (
     <Field.Root invalid={Boolean(errorMessage)} required={required}>
-      <Field.Label {...FIELD_LABEL_STYLE}>
+      <Field.Label textStyle="monoLabel" color="fg.muted">
         {label}
         {required ? <Field.RequiredIndicator /> : null}
       </Field.Label>

@@ -68,8 +68,8 @@ describe("seedDemoData", () => {
   });
 
   it.each([
-    ["in the middle of a month", new Date(2026, 10, 19, 12)],
-    ["in the first minutes of a month", new Date(2026, 10, 1, 0, 5)],
+    ["in the middle of a month", new Date("2026-11-19T15:00:00.000Z")],
+    ["in the first minutes of a month", new Date("2026-11-01T03:05:00.000Z")],
   ])("reaches the month of the seed without passing it, %s", async (_case, now) => {
     await seedDemoData(environment.dataSource, passwordHasher, now);
 

@@ -209,11 +209,7 @@ function NavigationContent({
             <Text
               px="5"
               mb="2"
-              fontFamily="mono"
-              fontSize="2xs"
-              fontWeight="600"
-              textTransform="uppercase"
-              letterSpacing="0.18em"
+              textStyle="monoLabel"
               color="whiteAlpha.600"
               whiteSpace="nowrap"
               css={visibleWhenExpandedStyle}
@@ -302,13 +298,7 @@ function NavigationContent({
             <Text fontSize="sm" fontWeight="600" truncate>
               {sessionUser.name}
             </Text>
-            <Text
-              fontFamily="mono"
-              fontSize="2xs"
-              color="whiteAlpha.600"
-              textTransform="uppercase"
-              letterSpacing="wider"
-            >
+            <Text textStyle="monoLabel" color="whiteAlpha.600">
               {ROLE_LABELS[sessionUser.role]}
             </Text>
           </Box>

@@ -4,6 +4,8 @@ description: Implements or changes the panel in apps/frontend (screens, componen
 tools: Read, Edit, Write, Glob, Grep, Bash
 model: opus
 maxTurns: 60
+skills:
+  - new-screen
 ---
 
 # frontend-developer

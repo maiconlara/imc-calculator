@@ -3,6 +3,15 @@ import { SESSION_EXPIRED_ROUTE } from "@/lib/routes";
 
 export type BackendApi = AxiosInstance;
 
+export interface RequestOptions {
+  signal?: AbortSignal;
+  /**
+   * API instance that calls the backend directly with the session token, passed by
+   * server components. Without it the request goes through `proxiedBackendApi`.
+   */
+  directBackendApi?: BackendApi;
+}
+
 const PROXIED_REQUEST_TIMEOUT_MS = 15_000;
 
 /**

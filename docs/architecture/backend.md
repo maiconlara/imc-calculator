@@ -40,7 +40,7 @@ src/
 │   └── logger.ts           pino logger
 └── shared/
     ├── errors.ts           domain error classes
-    ├── clock.ts            injectable clock
+    ├── clock.ts            injectable clock and the start of the month in the gym time zone
     └── http/               authentication middlewares and error handler
 ```
 
@@ -103,4 +103,4 @@ The users module is the model to copy. In Claude Code, the `new-backend-module` 
 
 ## Tests
 
-End-to-end tests with Vitest and Supertest run the real app against an in-memory SQLite database, one per test file, with a fixed clock. They cover each endpoint for each role, including the forbidden paths.
+End-to-end tests with Vitest and Supertest run the real app against an in-memory SQLite database, one per test file, with a fixed clock. They cover each endpoint for each role, including the forbidden paths. The tests run with `TZ=UTC`, outside the gym time zone, so code that depends on the machine's zone fails (see [decisions/0010-gym-time-zone.md](../decisions/0010-gym-time-zone.md)).

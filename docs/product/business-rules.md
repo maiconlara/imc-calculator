@@ -65,7 +65,7 @@ Any teacher can record an assessment for any active student. The reasoning and t
 ## Dashboard numbers
 
 - **Active students:** every student with status active, for the administrator and for teachers alike, since any teacher can assess any active student. Students do not get this number.
-- **Assessments this month:** assessments created since the first day of the current month, in the server time zone.
+- **Assessments this month:** assessments created since the first day of the current month, in the gym time zone (`America/Sao_Paulo`), whatever the time zone of the server.
 - **Assessed students, current average BMI and current classification:** only the latest assessment of each active student. Two assessments at the same instant count once.
 - **Assessment counters:** the full history.
 

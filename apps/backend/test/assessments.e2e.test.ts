@@ -569,20 +569,20 @@ describe("GET /api/assessments/summary", () => {
     expect(response.body).toMatchObject({ totalAssessments: 6, assessedStudents: 3 });
   });
 
-  it("counts the month from its first instant in the server time zone", async () => {
+  it("counts the month from its first instant in the gym time zone", async () => {
     await environment.recordAssessment({
       student: lucas,
       assessor: rafael,
       weight: 70,
       height: 1.8,
-      createdAt: new Date(2026, 10, 1, 0, 0, 0),
+      createdAt: "2026-11-01T03:00:00.000Z",
     });
     await environment.recordAssessment({
       student: lucas,
       assessor: rafael,
       weight: 71,
       height: 1.8,
-      createdAt: new Date(2026, 9, 31, 23, 59, 59),
+      createdAt: "2026-11-01T02:59:59.000Z",
     });
 
     const response = await as("admin").get("/api/assessments/summary").expect(200);
