@@ -20,7 +20,8 @@
     "format:check": "prettier --check .",
     "check": "pnpm format:check && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "db:migrate": "pnpm --filter @imc-calculator/backend db:migrate",
-    "db:revert": "pnpm --filter @imc-calculator/backend db:revert"
+    "db:revert": "pnpm --filter @imc-calculator/backend db:revert",
+    "db:seed": "pnpm --filter @imc-calculator/backend db:seed"
   },
   "devDependencies": {
     "prettier": "3.10.1"

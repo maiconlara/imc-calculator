@@ -10,7 +10,7 @@ import {
 import { createApp } from "../src/app";
 import { createContainer, type ContainerSettings } from "../src/container";
 import { createDataSource } from "../src/infra/database/data-source";
-import { AssessmentSchema } from "../src/infra/database/schemas/assessment.schema";
+import { TypeormAssessmentRepository } from "../src/infra/database/repositories/typeorm-assessment.repository";
 import { UserSchema } from "../src/infra/database/schemas/user.schema";
 import { BcryptPasswordHasher } from "../src/infra/security/bcrypt-password-hasher";
 import type { User } from "../src/modules/users/user";
@@ -53,6 +53,7 @@ export async function createTestEnvironment(options: { allowedOrigins?: string[]
     },
   );
 
+  const assessmentRepository = new TypeormAssessmentRepository(dataSource);
   const passwordHasher = new BcryptPasswordHasher(TEST_SETTINGS.BCRYPT_ROUNDS);
   const testUserPasswordHash = await passwordHasher.hash(TEST_USER_PASSWORD);
 
@@ -99,11 +100,9 @@ export async function createTestEnvironment(options: { allowedOrigins?: string[]
     assessor: User;
     weight: number;
     height: number;
-    createdAt: string;
+    createdAt: string | Date;
   }): Promise<string> {
-    const assessmentId = randomUUID();
-    await dataSource.getRepository(AssessmentSchema).insert({
-      id: assessmentId,
+    return assessmentRepository.create({
       height: assessment.height,
       weight: assessment.weight,
       ...assessBmi(assessment.weight, assessment.height),
@@ -111,7 +110,6 @@ export async function createTestEnvironment(options: { allowedOrigins?: string[]
       assessorId: assessment.assessor.id,
       createdAt: new Date(assessment.createdAt),
     });
-    return assessmentId;
   }
 
   function httpRequestAs(accessToken: string) {

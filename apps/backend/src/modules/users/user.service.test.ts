@@ -33,6 +33,7 @@ describe("UserService.deleteUser", () => {
       findByUsername: vi.fn(async () => null),
       listPaginated: vi.fn(),
       listOptions: vi.fn(),
+      count: vi.fn(),
       findIdsWithAssessments: vi.fn(async () => new Set<string>()),
     };
     const userService = new UserService({

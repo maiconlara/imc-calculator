@@ -35,7 +35,7 @@ src/
 ├── infra/
 │   ├── database/           data source, connection check, TypeORM schemas, value translation,
 │   │                       text folding (fold_text), migrations, repositories, seed,
-│   │                       and cli/ (migrate and revert commands)
+│   │                       and cli/ (migrate, revert and seed commands)
 │   ├── security/           bcrypt hasher and JWT token service
 │   └── logger.ts           pino logger
 └── shared/
@@ -74,7 +74,7 @@ Express 5 forwards errors thrown by async handlers to the error handler, so cont
 
 ## Configuration
 
-Every setting comes from an environment variable, validated at startup by `config/env.ts`, and the app refuses to start with an invalid value. The full list with sample values is in `apps/backend/.env.example`; a new setting is added to both files and to this table in the same PR. The migrate and revert commands validate only `NODE_ENV`, `LOG_LEVEL` and `DB_DATABASE`, so they run without the API secrets.
+Every setting comes from an environment variable, validated at startup by `config/env.ts`, and the app refuses to start with an invalid value. The full list with sample values is in `apps/backend/.env.example`; a new setting is added to both files and to this table in the same PR. The migrate and revert commands validate only `NODE_ENV`, `LOG_LEVEL` and `DB_DATABASE`, and the seed command also `BCRYPT_ROUNDS`, so they run without the API secrets.
 
 | Variable                 | Purpose                                                                                                                               |
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |

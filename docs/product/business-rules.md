@@ -2,19 +2,20 @@
 
 ## Permissions by role
 
-| Action                                         | Administrator | Teacher           | Student               |
-| ---------------------------------------------- | ------------- | ----------------- | --------------------- |
-| See users                                      | any role      | students only     | no                    |
-| Create and edit users                          | any role      | students only     | no                    |
-| Activate and deactivate users                  | any role      | students only     | no                    |
-| Delete a user (only with no linked assessment) | yes           | no                | no                    |
-| Record and edit assessments                    | all           | of their students | no                    |
-| Delete assessments                             | yes           | no                | no                    |
-| See assessments                                | all           | of their students | only their own        |
-| Filter assessments by student                  | yes           | yes               | no (always their own) |
-| Filter assessments by teacher                  | yes           | no                | no                    |
+| Action                                         | Administrator      | Teacher            | Student               |
+| ---------------------------------------------- | ------------------ | ------------------ | --------------------- |
+| See users                                      | any role           | students only      | no                    |
+| Create and edit users                          | any role           | students only      | no                    |
+| Activate and deactivate users                  | any role           | students only      | no                    |
+| Delete a user (only with no linked assessment) | yes                | no                 | no                    |
+| Record assessments                             | any active student | any active student | no                    |
+| Edit assessments                               | all                | of their students  | no                    |
+| Delete assessments                             | yes                | no                 | no                    |
+| See assessments                                | all                | of their students  | only their own        |
+| Filter assessments by student                  | yes                | yes                | no (always their own) |
+| Filter assessments by teacher                  | yes                | no                 | no                    |
 
-The API enforces every line of this table. The panel only hides what the role cannot do, so the person is never offered an action that would fail.
+The API enforces every line of this table. The panel only hides what the role cannot do, so the person is never offered an action that would fail. A filter the role cannot use answers 403 instead of being ignored: a teacher or a student filtering by teacher, or a student asking for another student.
 
 ## Users
 
@@ -63,12 +64,12 @@ Any teacher can record an assessment for any active student. The reasoning and t
 
 ## Dashboard numbers
 
-- **Active students:** students with status active.
+- **Active students:** every student with status active, for the administrator and for teachers alike, since any teacher can assess any active student. Students do not get this number.
 - **Assessments this month:** assessments created since the first day of the current month, in the server time zone.
-- **Assessed students, current average BMI and current classification:** only the latest assessment of each active student.
+- **Assessed students, current average BMI and current classification:** only the latest assessment of each active student. Two assessments at the same instant count once.
 - **Assessment counters:** the full history.
 
-For a teacher, every number above is limited to their students.
+For a teacher, every number except active students is limited to their students. For a student, every number covers only their own assessments, and the summary also brings their progress.
 
 ## Sign in
 

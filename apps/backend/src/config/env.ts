@@ -45,7 +45,11 @@ const migrationEnvSchema = z.object({
   DB_DATABASE: z.string().min(1).default("database.sqlite"),
 });
 
-const envSchema = migrationEnvSchema
+const seedEnvSchema = migrationEnvSchema.extend({
+  BCRYPT_ROUNDS: z.coerce.number().int().min(4).max(15).default(10),
+});
+
+const envSchema = seedEnvSchema
   .extend({
     PORT: z.coerce.number().int().min(0).max(65535).default(3333),
     CORS_ORIGIN: z
@@ -82,7 +86,6 @@ const envSchema = migrationEnvSchema
       ),
     JWT_ACCESS_TTL_MINUTES: z.coerce.number().int().min(1).max(1440).default(15),
     REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().min(1).max(90).default(7),
-    BCRYPT_ROUNDS: z.coerce.number().int().min(4).max(15).default(10),
   })
   .refine(
     (env) =>
@@ -95,6 +98,7 @@ const envSchema = migrationEnvSchema
 
 export type Env = z.output<typeof envSchema>;
 export type MigrationEnv = z.output<typeof migrationEnvSchema>;
+export type SeedEnv = z.output<typeof seedEnvSchema>;
 
 function parseEnvironmentVariables<T extends z.ZodType>(
   schema: T,
@@ -133,4 +137,17 @@ export function loadMigrationEnv(
   environmentVariables: NodeJS.ProcessEnv = process.env,
 ): MigrationEnv {
   return parseEnvironmentVariables(migrationEnvSchema, environmentVariables);
+}
+
+/**
+ * Loads `.env` (when present) and validates what the seed command uses: the migration
+ * settings plus the bcrypt cost of the demo passwords.
+ *
+ * @param environmentVariables - Variables to validate, `process.env` by default.
+ * @returns The typed configuration of the seed command.
+ */
+export function loadSeedEnv(
+  environmentVariables: NodeJS.ProcessEnv = process.env,
+): SeedEnv {
+  return parseEnvironmentVariables(seedEnvSchema, environmentVariables);
 }

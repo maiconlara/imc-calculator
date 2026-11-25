@@ -4,7 +4,7 @@
 
 Web system for a gym to track the Body Mass Index (BMI, "IMC" in Portuguese) of its students. Teachers record assessments with height and weight, the system calculates and stores the BMI and its classification, and each student follows their own progress.
 
-> The project is under construction. The monorepo and its tooling are in place; the API and the panel are being added, and the instructions to run them arrive together with the code.
+> The project is under construction. The API is complete; the panel is being added, and the instructions to run it arrive together with its code.
 
 ## What it does
 
@@ -51,6 +51,34 @@ pnpm check
 ```
 
 `pnpm check` runs format, lint, type check, tests and build, the same steps the CI runs on every pull request.
+
+### Running the API
+
+1. Create the API settings from the sample, whose values work for development:
+
+   ```bash
+   cp apps/backend/.env.example apps/backend/.env
+   ```
+
+2. Create the database with the demo gym. The command applies the migrations, replaces every row and prints the demo logins:
+
+   ```bash
+   pnpm db:seed
+   ```
+
+3. Start the API with hot reload on `http://localhost:3333/api`:
+
+   ```bash
+   pnpm dev:backend
+   ```
+
+4. Sign in as a teacher and use the returned `accessToken` as `Authorization: Bearer <accessToken>` on the other routes:
+
+   ```bash
+   curl -X POST http://localhost:3333/api/auth/login -H "Content-Type: application/json" -d '{"username":"carla.mendes","password":"prof1234"}'
+   ```
+
+The other demo logins are listed in [docs/architecture/database.md](docs/architecture/database.md#demo-data), and every route is in the [API reference](docs/api.md). `pnpm db:migrate` alone applies new migrations without touching the data.
 
 ## Documentation
 

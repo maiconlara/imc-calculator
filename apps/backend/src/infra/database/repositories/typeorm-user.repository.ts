@@ -97,6 +97,10 @@ export class TypeormUserRepository implements UserRepository {
     return users.map(({ id, name, status }) => ({ id, name, status }));
   }
 
+  count(userFilters: UserFilters): Promise<number> {
+    return this.buildFilteredQuery(userFilters).getCount();
+  }
+
   async findIdsWithAssessments(userIds: string[]): Promise<Set<string>> {
     const userIdsWithAssessments = new Set<string>();
     if (userIds.length === 0) return userIdsWithAssessments;
