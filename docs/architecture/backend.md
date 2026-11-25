@@ -37,7 +37,7 @@ src/
 │   │                       text folding (fold_text), migrations, repositories, seed,
 │   │                       and cli/ (migrate, revert and seed commands)
 │   ├── security/           bcrypt hasher and JWT token service
-│   └── logger.ts           pino logger
+│   └── logger.ts           pino logger, human readable only when pino-pretty is installed
 └── shared/
     ├── errors.ts           domain error classes
     ├── clock.ts            injectable clock and the start of the month in the gym time zone
@@ -100,6 +100,12 @@ Every setting comes from an environment variable, validated at startup by `confi
 7. Document the endpoints in [api.md](../api.md).
 
 The users module is the model to copy. In Claude Code, the `new-backend-module` skill (`.claude/skills/new-backend-module/SKILL.md`) details each step.
+
+## Build and Docker
+
+`pnpm build` bundles the API with tsdown into `dist/`: `main.mjs` (the API), `migrate.mjs`, `revert.mjs` and `seed.mjs`. The shared package goes inside the bundle, and the other dependencies stay in `node_modules`.
+
+The `api` target of the root `Dockerfile` runs that bundle with only the production dependencies, as the `node` user. Its entry point, `docker-entrypoint.sh`, generates `JWT_ACCESS_SECRET` on the first start when it is not set and keeps it next to the database, applies the migrations and starts the API, with source maps on so stack traces point at the TypeScript files. In production mode the logs are JSON. The image has no `pino-pretty`, so even a command run there with `NODE_ENV=development`, such as the demo seed, logs JSON. The reasons are in [decisions/0011-docker-setup.md](../decisions/0011-docker-setup.md).
 
 ## Tests
 

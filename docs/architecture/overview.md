@@ -11,7 +11,9 @@ imc-calculator/
 │   └── shared/      BMI rules, roles, Zod schemas and API types used by both apps
 ├── docs/            This documentation
 ├── .claude/         Claude Code agents, skills and settings
-└── .github/         Issue and PR templates, CI workflows
+├── .github/         Issue and PR templates, CI workflows
+├── Dockerfile       Multi-stage build of the API and panel images
+└── compose.yaml     API, panel and demo seed with Docker Compose
 ```
 
 ## How a request travels
@@ -62,5 +64,8 @@ Two common paths:
 - [0006: who the teacher's students are](../decisions/0006-teacher-students.md)
 - [0007: pinned versions](../decisions/0007-pinned-versions.md)
 - [0008: dependency supply chain guards](../decisions/0008-dependency-supply-chain-guards.md)
+- [0009: visitor address on login](../decisions/0009-visitor-address-on-login.md)
+- [0010: gym time zone](../decisions/0010-gym-time-zone.md)
+- [0011: Docker setup](../decisions/0011-docker-setup.md)
 
 Details of each side: [backend.md](backend.md), [frontend.md](frontend.md), [database.md](database.md).

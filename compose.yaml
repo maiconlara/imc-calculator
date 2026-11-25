@@ -1,0 +1,59 @@
+name: imc-calculator
+
+services:
+  api:
+    image: imc-calculator-api
+    build:
+      context: .
+      target: api
+    environment:
+      CORS_ORIGIN: http://localhost:${PANEL_PORT:-3000}
+      TRUST_PROXY: uniquelocal
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-}
+    volumes:
+      - api-data:/data
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://localhost:3333/api/health').then((response) => process.exit(response.ok ? 0 : 1), () => process.exit(1))"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    restart: unless-stopped
+
+  panel:
+    image: imc-calculator-panel
+    build:
+      context: .
+      target: panel
+    environment:
+      BACKEND_URL: http://api:3333/api
+      TRUSTED_PROXY_COUNT: "0"
+    ports:
+      - 127.0.0.1:${PANEL_PORT:-3000}:3000
+    depends_on:
+      api:
+        condition: service_healthy
+    restart: unless-stopped
+
+  seed:
+    image: imc-calculator-api
+    build:
+      context: .
+      target: api
+    profiles:
+      - seed
+    environment:
+      NODE_ENV: development
+    volumes:
+      - api-data:/data
+    entrypoint:
+      - node
+      - --enable-source-maps
+      - dist/seed.mjs
+
+volumes:
+  api-data:

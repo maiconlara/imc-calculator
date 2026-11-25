@@ -16,6 +16,7 @@ Each file here records one architecture decision: the context, what was chosen a
 | 0008 | [Dependency supply chain guards](0008-dependency-supply-chain-guards.md)                   | accepted |
 | 0009 | [Visitor address on login](0009-visitor-address-on-login.md)                               | accepted |
 | 0010 | [Gym time zone](0010-gym-time-zone.md)                                                     | accepted |
+| 0011 | [Docker setup](0011-docker-setup.md)                                                       | accepted |
 
 ## When to write one
 

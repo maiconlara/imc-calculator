@@ -5,6 +5,7 @@ export default defineConfig({
     main: "src/main.ts",
     migrate: "src/infra/database/cli/migrate.ts",
     revert: "src/infra/database/cli/revert.ts",
+    seed: "src/infra/database/cli/seed.ts",
   },
   format: "esm",
   platform: "node",
