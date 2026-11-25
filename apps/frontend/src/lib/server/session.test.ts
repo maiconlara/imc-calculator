@@ -120,6 +120,27 @@ describe("requireSessionUser", () => {
   });
 });
 
+describe("getDirectBackendApi", () => {
+  it("calls the API directly with the access token of the cookie", async () => {
+    requestCookies.set(ACCESS_TOKEN_COOKIE, "teacher-access");
+
+    const directBackendApi = await session.getDirectBackendApi();
+    await directBackendApi.get("/auth/me");
+
+    expect(fakeBackend.receivedRequests.at(-1)).toMatchObject({
+      url: "/api/auth/me",
+      authorization: "Bearer teacher-access",
+    });
+  });
+
+  it("sends no token without an access cookie", async () => {
+    const directBackendApi = await session.getDirectBackendApi();
+    await expect(directBackendApi.get("/auth/me")).rejects.toThrow();
+
+    expect(fakeBackend.receivedRequests.at(-1)?.authorization).toBeUndefined();
+  });
+});
+
 describe("getScreenMetadata", () => {
   it("names the tab after the screen as the role sees it", async () => {
     requestCookies.set(ACCESS_TOKEN_COOKIE, "teacher-access");

@@ -15,6 +15,12 @@ export const toaster = createToaster({
   max: 4,
 });
 
+export const notify = {
+  success: (title: string) => toaster.create({ type: "success", title, closable: true }),
+  error: (title: string) =>
+    toaster.create({ type: "error", title, closable: true, duration: 7000 }),
+};
+
 export function Toaster() {
   return (
     <Portal>

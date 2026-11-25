@@ -4,6 +4,12 @@ export const DEFAULT_PAGE_SIZE = 10;
 export const MAX_PAGE_SIZE = 100;
 
 /**
+ * Time zone of the gym. Dates on screen and the monthly counts follow it, whatever
+ * the time zone of the machine that runs the API or the panel.
+ */
+export const GYM_TIME_ZONE = "America/Sao_Paulo";
+
+/**
  * Treats empty query string values as absent before validating them.
  *
  * @param schema - Schema applied when the value is present.

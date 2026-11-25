@@ -10,7 +10,12 @@ import { HOME_ROUTE, SESSION_EXPIRED_ROUTE, type PanelScreen } from "@/lib/route
 import { getScreenTitle } from "@/lib/screen-titles";
 import { ACCESS_TOKEN_COOKIE } from "@/lib/session/cookies";
 import { SESSION_RENEWAL_FAILED_HEADER } from "@/lib/session/session-renewal";
+import type { BackendApi } from "@/services";
 import { createDirectBackendApi } from "./backend";
+
+async function getAccessTokenFromCookie(): Promise<string | undefined> {
+  return (await cookies()).get(ACCESS_TOKEN_COOKIE)?.value;
+}
 
 /**
  * Reads the signed in user from the API once per request. The API checks the user in
@@ -21,7 +26,7 @@ import { createDirectBackendApi } from "./backend";
  *         page shows its error screen instead of ending the session.
  */
 export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
-  const accessToken = (await cookies()).get(ACCESS_TOKEN_COOKIE)?.value;
+  const accessToken = await getAccessTokenFromCookie();
   if (!accessToken) {
     if ((await headers()).get(SESSION_RENEWAL_FAILED_HEADER)) {
       throw new Error("The API failed while the session was being renewed");
@@ -62,4 +67,14 @@ export async function requireSessionUser(screen?: PanelScreen): Promise<SessionU
 export async function getScreenMetadata(screen: PanelScreen): Promise<Metadata> {
   const sessionUser = await getSessionUser();
   return sessionUser ? { title: getScreenTitle(screen, sessionUser.role) } : {};
+}
+
+/**
+ * Creates the API instance server components pass to the query options, so their
+ * fetch calls the backend directly with the access token read from the cookie.
+ *
+ * @returns An API instance authenticated as the signed in user.
+ */
+export async function getDirectBackendApi(): Promise<BackendApi> {
+  return createDirectBackendApi(await getAccessTokenFromCookie());
 }

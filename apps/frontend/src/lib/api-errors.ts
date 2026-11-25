@@ -22,6 +22,27 @@ export function getErrorMessage(
   return error instanceof Error && error.message ? error.message : fallback;
 }
 
+/**
+ * Picks the field errors of a 400 answer that belong to a form, so each message shows
+ * under its own field.
+ *
+ * @param error - Error thrown by the mutation.
+ * @param formFieldNames - Names of the fields the form has.
+ * @returns One entry per known field with an error; empty when there is none.
+ */
+export function getFieldErrors<FieldName extends string>(
+  error: unknown,
+  formFieldNames: readonly FieldName[],
+): { fieldName: FieldName; message: string }[] {
+  if (!axios.isAxiosError<ApiErrorBody>(error)) return [];
+  return (error.response?.data?.issues ?? []).flatMap((issue) => {
+    const fieldName = formFieldNames.find(
+      (formFieldName) => formFieldName === issue.path,
+    );
+    return fieldName ? [{ fieldName, message: issue.message }] : [];
+  });
+}
+
 export function getErrorStatus(error: unknown): number | undefined {
   return axios.isAxiosError(error) ? error.response?.status : undefined;
 }

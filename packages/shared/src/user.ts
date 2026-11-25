@@ -20,6 +20,7 @@ export const USER_STATUS_LABELS: Record<UserStatus, string> = {
 
 export const PASSWORD_MIN_LENGTH = 8;
 export const PASSWORD_MAX_LENGTH = 72;
+export const USER_SEARCH_MAX_LENGTH = 60;
 
 /**
  * Counts the bytes a text takes in UTF-8, the unit bcrypt limits passwords by.
@@ -115,7 +116,10 @@ export const listUsersQuerySchema = paginationSchema.extend({
     z
       .string({ error: "Busca inválida" })
       .trim()
-      .max(60, "A busca pode ter no máximo 60 caracteres"),
+      .max(
+        USER_SEARCH_MAX_LENGTH,
+        `A busca pode ter no máximo ${USER_SEARCH_MAX_LENGTH} caracteres`,
+      ),
   ),
   role: optionalParam(roleSchema),
   status: optionalParam(userStatusSchema),

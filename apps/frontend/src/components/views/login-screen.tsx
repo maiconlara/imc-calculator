@@ -106,14 +106,7 @@ export function LoginScreen({
         </Box>
 
         <Box>
-          <Text
-            fontFamily="mono"
-            fontSize="2xs"
-            textTransform="uppercase"
-            letterSpacing="0.18em"
-            color="whiteAlpha.600"
-            mb="3"
-          >
+          <Text textStyle="monoLabel" color="whiteAlpha.600" mb="3">
             Tabela de IMC da OMS
           </Text>
           <Flex gap="1" h="2.5" borderRadius="full" overflow="hidden" maxW="md">

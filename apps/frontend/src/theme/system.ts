@@ -15,6 +15,18 @@ const config = defineConfig({
     },
   },
   theme: {
+    textStyles: {
+      monoLabel: {
+        value: {
+          fontFamily: "mono",
+          fontSize: "2xs",
+          fontWeight: "medium",
+          lineHeight: "1rem",
+          textTransform: "uppercase",
+          letterSpacing: "wider",
+        },
+      },
+    },
     tokens: {
       fonts: {
         heading: { value: "var(--font-heading), 'Arial Narrow', system-ui, sans-serif" },
